@@ -2,7 +2,7 @@
 #define __SYSTEM_H__
 
 #include <stdint.h>
-#define FREQ_SYS 24000000
+
 
 void InitUART();
 void CfgSysClock();
