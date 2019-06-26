@@ -63,6 +63,9 @@ static void send(uint8_t index, uint8_t len, uint8_t* keys)
 #ifdef HAS_USB
     if (usb_working()) {
         usb_send(index, len, keys);
+        if (multi_output()) {
+            keys_send(index, len, keys);
+        }
     } else
 #endif
     {
@@ -73,7 +76,7 @@ static void send(uint8_t index, uint8_t len, uint8_t* keys)
 void send_keyboard(report_keyboard_t* report)
 {
 #if defined(NKRO_ENABLE) && defined(HAS_USB)
-    if (keyboard_protocol && keyboard_nkro) {
+    if (keyboard_protocol && keyboard_nkro && !multi_output()) {
         send(3, NKRO_EPSIZE, report->raw);
     } else
 #endif

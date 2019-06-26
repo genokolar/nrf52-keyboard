@@ -1,9 +1,9 @@
 #if !defined(__USB_COMM_H__)
 #define __USB_COMM_H__
 
+#include "../config/keyboard_config.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "../config/keyboard_config.h"
 
 /**
  * @brief 当前USB是否正常连接到主机
@@ -12,6 +12,13 @@
  * @return false 
  */
 bool usb_working(void);
+/**
+ * @brief 当前USB是否正常连接到主机
+ * 
+ * @return true 
+ * @return false 
+ */
+bool multi_output(void);
 
 /**
  * @brief 通过USB发送数据包
@@ -45,6 +52,12 @@ void usb_comm_timer_start(void);
  * 
  */
 void usb_comm_switch(void);
+
+/**
+ * @brief 切换BLE/USB多端输出
+ * 
+ */
+void multi_output_switch();
 
 /**
  * @brief 当前USB的键盘状态灯

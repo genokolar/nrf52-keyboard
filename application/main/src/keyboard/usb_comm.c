@@ -46,6 +46,7 @@ static uint8_t recv_index;
 static bool has_host;
 static bool is_full, is_connected, is_checked, is_disable;
 static bool usb_protocol;
+static bool enable_multi_output;
 
 struct queue_item {
     uint8_t data[MAX_ITEM_SIZE];
@@ -287,6 +288,17 @@ bool usb_working(void)
 }
 
 /**
+ * @brief 是否BLE/USB多端输出
+ * 
+ * @return true 
+ * @return false 
+ */
+bool multi_output(void)
+{
+    return enable_multi_output;
+}
+
+/**
  * @brief 通过USB发送按键数据包
  * 
  * @param index 数据包类型
@@ -331,7 +343,7 @@ void usb_comm_init()
     nrf_gpio_cfg_input(UART_RXD, NRF_GPIO_PIN_PULLDOWN);
     if (nrf_gpio_pin_read(UART_RXD)) {
 #endif
-    // 初始化时启用UART尝试接收事件，若没有主机则在超时处关闭
+        // 初始化时启用UART尝试接收事件，若没有主机则在超时处关闭
         uart_init_hardware();
     }
 }
@@ -373,6 +385,19 @@ void usb_comm_switch()
         } else {
             send_event(USER_USB_CONNECTED);
         }
+    }
+}
+
+/**
+ * @brief 切换BLE/USB多端输出
+ * 
+ */
+void multi_output_switch()
+{
+    if (enable_multi_output) {
+        enable_multi_output = false;
+    } else {
+        enable_multi_output = true;
     }
 }
 
