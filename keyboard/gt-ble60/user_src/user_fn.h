@@ -10,7 +10,6 @@ enum fn_functions {
     AF_POWER_OFF,
     AF_DELETE_BOND,	
     AF_LED_DISPLAY,
-    AF_MULTI_OUTPUT
 };
 
 #endif

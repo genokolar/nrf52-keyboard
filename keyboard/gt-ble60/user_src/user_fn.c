@@ -58,11 +58,6 @@ void action_function(keyrecord_t* record, uint8_t id, uint8_t opt)
             }
         }
         break;
-    case AF_MULTI_OUTPUT:
-        if (!record->event.pressed) {
-             multi_output_switch();
-        }
-        break;
     case AF_TRICKY_ESC:
         if (record->event.pressed) {
             if (get_mods() & MODS_SHIFT_MASK) {
