@@ -691,6 +691,11 @@ static void advertising_init(void)
     APP_ERROR_CHECK(err_code);
 
     ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
+#ifdef HIGH_TX_POWER
+    //更改发射功率到+4dBm
+    err_code = sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_advertising.adv_handle, 4); 
+    APP_ERROR_CHECK(err_code);
+#endif
 }
 
 void ble_passkey_send(uint8_t const* p_key)
