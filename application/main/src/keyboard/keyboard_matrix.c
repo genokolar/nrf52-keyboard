@@ -128,7 +128,9 @@ static inline void delay_30ns(void)
 #ifdef __GNUC__
 #define __nop() __asm("NOP")
 #endif
-    __nop(); // 32mhz, 1cycle = 31.25ns
+    for (int i = 0; i < 25; i++) {
+        __nop(); //32mhz, 1cycle = 31.25ns
+    }
 }
 
 uint8_t matrix_scan(void)
