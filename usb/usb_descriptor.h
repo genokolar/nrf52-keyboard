@@ -229,10 +229,9 @@ uint8_t const StringDescriptor[] = {
 
     // String index2, Product
 
-    36,        // Length of this string descriptor
+    24,        // Length of this string descriptor
     3,        // bDescriptorType
-    'G',0x00,'T',0x00,' ',0x00,'B',0x00,'L',0x00,'E',0x00,
-    '6',0x00,'0',0x00,' ',0x00,'K',0x00,'e',0x00,'y',0x00,
+    'G',0x00,'T',0x00,' ',0x00,'K',0x00,'e',0x00,'y',0x00,
     'b',0x00,'o',0x00,'a',0x00,'r',0x00,'d',0x00,
 
     // String index3, Serial Number
