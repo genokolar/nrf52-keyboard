@@ -78,7 +78,7 @@ void action_function(keyrecord_t* record, uint8_t id, uint8_t opt)
             if (get_mods() & MODS_SHIFT_MASK) {
                 tricky_slsh_registered = KC_SLSH;
             } else {
-                tricky_slsh_registered = KC_UP;
+                tricky_slsh_registered = KC_DOT;
             }
             register_code(tricky_slsh_registered);
             send_keyboard_report();
