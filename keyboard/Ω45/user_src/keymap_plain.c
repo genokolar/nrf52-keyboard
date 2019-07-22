@@ -29,12 +29,12 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	KEYMAP(
         ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   BSLS, \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,LBRC,RBRC, FN10,  \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,UP  ,     TRNS, \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,UP  ,     TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          LEFT,DOWN,RGHT,TRNS),
     /* 2: F area */
     KEYMAP(
         F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11,  F12,  \
-        FN8,TRNS,TRNS,FN9 ,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,  FN6,  \
+        FN8,TRNS,TRNS,FN9 ,TRNS,TRNS,TRNS,TRNS,TRNS, MINS,EQL,  FN6,  \
         FN7,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,      TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
     /* 3: other */
