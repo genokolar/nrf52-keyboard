@@ -59,6 +59,7 @@ static void config_update()
     if (rc != FDS_SUCCESS) {
         /* Handle error. */
     }
+    fds_gc();
 }
 
 /**

@@ -146,6 +146,7 @@ void keymap_write(void)
 {
     keymap_valid();
     keymap_update();
+    fds_gc();
 }
 #else
 void keymap_init(void) {}
