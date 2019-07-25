@@ -23,7 +23,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KEYMAP(
         TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   BSPC, \
         CAPS,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN, ENT,  \
-        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,FN5,       RSFT,  \
+        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,FN5,       FN11,  \
         LCTL,LGUI,LALT,FN0,     SPC,            FN1, FN2, FN3, FN4),
     /* 1: NUM */
 	KEYMAP(
@@ -40,7 +40,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* 3: other */
     KEYMAP(
         GRV, MYCM,MAIL,CALC,MSEL,TRNS,TRNS,TRNS,MPLY,MPRV,MNXT,  BSLS,  \
-        TRNS,TRNS,TRNS,FN9 ,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,QUOT,  TRNS,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,QUOT,  TRNS,  \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,      TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
 };
@@ -57,5 +57,6 @@ const action_t PROGMEM fn_actions[] = {
     [8] = ACTION_FUNCTION(AF_POWER_OFF),
     [9] = ACTION_FUNCTION(AF_DELETE_BOND),
     [10] = ACTION_FUNCTION(AF_LED_DISPLAY),
+    [11] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_SLSH),
 };
 
