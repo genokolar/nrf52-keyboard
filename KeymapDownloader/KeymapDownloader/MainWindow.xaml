@@ -6,7 +6,7 @@
         xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:local="clr-namespace:KeymapDownloader"
         mc:Ignorable="d"
-        Title="配列下载工具" Height="174.003" Width="460.907" IsMaxRestoreButtonEnabled="False">
+        Title="nR52 Keyboard 配列下载器" Height="174.003" Width="460.907" IsMaxRestoreButtonEnabled="False">
     <Grid>
         <Grid Height="26" Margin="10,10,10,0" VerticalAlignment="Top">
             <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="选择设备" VerticalAlignment="Center"/>
