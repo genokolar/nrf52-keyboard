@@ -30,8 +30,10 @@ BOOTMAGIC_ENABLE = yes	# 启用Bootmagic
 EXTRAKEY_ENABLE = yes	# 启用媒体键功能
 NKRO_ENABLE = yes	# 启用USB的全键无冲功能
 # USB_6KRO_ENABLE = yes # 启用USB的六键无冲功能
-ifeq ($(NRF_CHIP), nrf52832)  # NRF52810由于空间问题不能启用
 COMMAND_ENABLE = yes    # 启用调试和配置的命令
+
+ifeq (yes,$(strip $(COMMAND_ENABLE)))
+    SRC_FILES += $(USER_SRC_DIR)/user_command.c
 endif
 
 all: default ch554
