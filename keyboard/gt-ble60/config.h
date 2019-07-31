@@ -114,7 +114,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 充电检测配置
 #define PIN_CHARGING !UCC1
-#define PIN_STANDBY !UCC2
+//#define PIN_STANDBY !UCC2
 
 // 按键阵列配置
 static const uint8_t row_pin_array[MATRIX_ROWS] = {29, 25, 23, 4, 3};
