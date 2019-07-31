@@ -36,11 +36,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 static bool command_common(uint8_t code);
-#ifdef MOUSEKEY_ENABLE
-static bool mousekey_console(uint8_t code);
-static void mousekey_console_help(void);
-static uint8_t numkey2num(uint8_t code);
-#endif
 
 
 static void switch_default_layer(uint8_t layer);
@@ -107,13 +102,12 @@ static bool command_common(uint8_t code)
         case KC_N:
             clear_keyboard(); //Prevents stuck keys.
             keyboard_nkro = !keyboard_nkro;
-            if (keyboard_nkro) {
-                print("NKRO: on\n");
-            } else {
-                print("NKRO: off\n");
-            }
             break;
 #endif
+        case KC_G:
+            clear_keyboard(); 
+            keyboard_no_gui = !keyboard_no_gui;
+            break;
         case KC_0:
         case KC_F10:
             switch_default_layer(0);

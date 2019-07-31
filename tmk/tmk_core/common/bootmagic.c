@@ -62,6 +62,7 @@ void bootmagic(void)
 
     /* keymap config */
     keymap_config.raw = eeconfig_read_keymap();
+#ifdef SWAP_KEY_ENABLE
     if (bootmagic_scan_key(BOOTMAGIC_KEY_SWAP_CONTROL_CAPSLOCK)) {
         keymap_config.swap_control_capslock = !keymap_config.swap_control_capslock;
     }
@@ -83,6 +84,7 @@ void bootmagic(void)
     if (bootmagic_scan_key(BOOTMAGIC_KEY_SWAP_BACKSLASH_BACKSPACE)) {
         keymap_config.swap_backslash_backspace = !keymap_config.swap_backslash_backspace;
     }
+#endif
     if (bootmagic_scan_key(BOOTMAGIC_HOST_NKRO)) {
         keymap_config.nkro = !keymap_config.nkro;
     }
@@ -91,7 +93,8 @@ void bootmagic(void)
 #ifdef NKRO_ENABLE
     keyboard_nkro = keymap_config.nkro;
 #endif
-
+    keyboard_no_gui = keymap_config.no_gui;
+    
     /* default layer */
     uint8_t default_layer = 0;
     if (bootmagic_scan_key(BOOTMAGIC_KEY_DEFAULT_LAYER_0)) { default_layer |= (1<<0); }

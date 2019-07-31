@@ -31,6 +31,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern keymap_config_t keymap_config;
 #endif
 
+bool keyboard_no_gui = false;
+
 static action_t keycode_to_action(uint8_t keycode);
 
 
@@ -56,7 +58,7 @@ action_t action_for_key(uint8_t layer, keypos_t key)
             return keycode_to_action(KC_LCTL);
         case KC_LALT:
             if (keymap_config.swap_lalt_lgui) {
-                if (keymap_config.no_gui) {
+                if (keyboard_no_gui) {
                     return keycode_to_action(KC_NO);
                 }
                 return keycode_to_action(KC_LGUI);
@@ -66,13 +68,13 @@ action_t action_for_key(uint8_t layer, keypos_t key)
             if (keymap_config.swap_lalt_lgui) {
                 return keycode_to_action(KC_LALT);
             }
-            if (keymap_config.no_gui) {
+            if (keyboard_no_gui) {
                 return keycode_to_action(KC_NO);
             }
             return keycode_to_action(KC_LGUI);
         case KC_RALT:
             if (keymap_config.swap_ralt_rgui) {
-                if (keymap_config.no_gui) {
+                if (keyboard_no_gui) {
                     return keycode_to_action(KC_NO);
                 }
                 return keycode_to_action(KC_RGUI);
@@ -82,7 +84,7 @@ action_t action_for_key(uint8_t layer, keypos_t key)
             if (keymap_config.swap_ralt_rgui) {
                 return keycode_to_action(KC_RALT);
             }
-            if (keymap_config.no_gui) {
+            if (keyboard_no_gui) {
                 return keycode_to_action(KC_NO);
             }
             return keycode_to_action(KC_RGUI);

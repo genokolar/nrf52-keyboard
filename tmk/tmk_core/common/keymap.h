@@ -40,6 +40,7 @@ typedef union {
 } keymap_config_t;
 #endif
 
+extern bool keyboard_no_gui;
 
 /* translates key to keycode */
 uint8_t keymap_key_to_keycode(uint8_t layer, keypos_t key);
