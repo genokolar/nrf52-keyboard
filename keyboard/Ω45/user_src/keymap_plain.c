@@ -23,23 +23,23 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     KEYMAP(
         TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   BSPC, \
         CAPS,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN, ENT,  \
-        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,FN5,       FN11,  \
+        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,FN5,       FN6,  \
         LCTL,LGUI,LALT,FN0,     SPC,            FN1, FN2, FN3, FN4),
     /* 1: NUM */
 	KEYMAP(
         ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   BSLS, \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,LBRC,RBRC, FN10,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,LBRC,RBRC,TRNS,  \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,UP  ,     TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          LEFT,DOWN,RGHT,TRNS),
     /* 2: F area */
     KEYMAP(
-        F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11,  F12,  \
-        FN8,TRNS,TRNS,FN9 ,TRNS,TRNS,TRNS,TRNS,TRNS, MINS,EQL,  FN6,  \
-        FN7,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,      TRNS, \
+        F1,   F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11,  F12,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,MINS, EQL, TRNS,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,      TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
     /* 3: other */
     KEYMAP(
-        GRV, MYCM,MAIL,CALC,MSEL,TRNS,TRNS,TRNS,MPLY,MPRV,MNXT,  BSLS,  \
+        GRV, MYCM,MAIL,CALC,MSEL,TRNS,TRNS,TRNS,MPLY,MPRV,MNXT,  FN7,  \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,QUOT,  TRNS,  \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,      TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
@@ -52,11 +52,7 @@ const action_t PROGMEM fn_actions[] = {
     [3] = ACTION_LAYER_TAP_KEY(3, KC_EQL),
     [4] = ACTION_MODS(MOD_RCTL),
     [5] = ACTION_FUNCTION(AF_TRICKY_SLSH),
-    [6] = ACTION_FUNCTION(AF_POWER_SLEEP),
-    [7] = ACTION_FUNCTION(AF_SWITCH_MODE),
-    [8] = ACTION_FUNCTION(AF_POWER_OFF),
-    [9] = ACTION_FUNCTION(AF_DELETE_BOND),
-    [10] = ACTION_FUNCTION(AF_LED_DISPLAY),
-    [11] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_SLSH),
+    [6] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_SLSH),
+    [7] = ACTION_FUNCTION(AF_POWER_SLEEP),
 };
 

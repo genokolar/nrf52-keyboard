@@ -79,23 +79,8 @@ static bool command_common(uint8_t code)
     static host_driver_t *host_driver = 0;
 #endif
     switch (code) {
-#ifdef KEYBOARD_LOCK_ENABLE
-        case KC_CAPSLOCK:
-            if (host_get_driver()) {
-                host_driver = host_get_driver();
-                clear_keyboard();
-                host_set_driver(0);
-                print("Locked.\n");
-            } else {
-                host_set_driver(host_driver);
-                print("Unlocked.\n");
-            }
-            break;
-#endif
         case KC_PAUSE:
             clear_keyboard();
-            print("\n\nbootloader... ");
-            wait_ms(1000);
             bootloader_jump(); // not return
             break;
 #ifdef NKRO_ENABLE

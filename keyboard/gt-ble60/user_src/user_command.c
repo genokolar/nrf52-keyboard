@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keymap.h"
 #include "main.h"
 #include "status_led.h"
-#include "timer.h"
 #include "usb_comm.h"
 #include "user_func.h"
 #include "util.h"
@@ -43,7 +42,6 @@ bool command_extra(uint8_t code)
         break;
     case KC_B:
         clear_keyboard();
-        wait_ms(1000);
         bootloader_jump(); // not return
         break;
     case KC_D:
@@ -61,10 +59,6 @@ bool command_extra(uint8_t code)
         clear_keyboard();
         usb_comm_switch();
 #endif
-        break;
-    case KC_S:
-        clear_keyboard();
-        sleep(SLEEP_MANUALLY);
         break;
     default:
         return false;
