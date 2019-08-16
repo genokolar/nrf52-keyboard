@@ -22,6 +22,10 @@ void ble_services_init(evt_handler handler);
  */
 void delete_bonds(void);
 
+void delete_bond_id(uint8_t id);
+void restart_advertising_id(uint8_t id);
+void restart_advertising_wo_whitelist();
+
 /**@brief Init Bluetooth stack
  */
 void ble_stack_init(void);

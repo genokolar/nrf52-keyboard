@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "nrf_delay.h"
 #include "status_led.h"
 #include "usb_comm.h"
+#include "user_command.h"
 #include "user_func.h"
 
 enum keyboard_status {
@@ -123,6 +124,7 @@ void custom_event_handler(enum user_ble_event arg)
     case USER_EVT_POST_INIT:
         status_led_init();
         buttons_init();
+        command_timer_init();
         break;
     case USER_LED_ON:
         status_led_on();
