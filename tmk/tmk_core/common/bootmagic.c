@@ -94,7 +94,8 @@ void bootmagic(void)
     keyboard_nkro = keymap_config.nkro;
 #endif
     keyboard_no_gui = keymap_config.no_gui;
-    
+
+#ifdef Default_LAYER_ENABLE   
     /* default layer */
     uint8_t default_layer = 0;
     if (bootmagic_scan_key(BOOTMAGIC_KEY_DEFAULT_LAYER_0)) { default_layer |= (1<<0); }
@@ -112,6 +113,7 @@ void bootmagic(void)
         default_layer = eeconfig_read_default_layer();
         default_layer_set((uint32_t)default_layer);
     }
+#endif
 }
 
 static bool scan_key(uint16_t code)
