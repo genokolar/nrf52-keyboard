@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PRODUCT_ID 0x0514 /* USB PID */
 #define DEVICE_VER 0x0001 /* 硬件版本 */
 #define MANUFACTURER "Lotlab" /* 硬件制造商，用于蓝牙显示 */
-#define PRODUCT "BLE60-Rev.C" /* 硬件名词，用于蓝牙显示 */
+#define PRODUCT "BLE Keyboard" /* 硬件名词，用于USB和蓝牙显示 */
 #define MACADDR_SEPRATOR '_' /* 蓝牙名称后地址的分隔符。若不设置则不显示蓝牙名称后面的地址 */
 
 /* USB HID report parameter */
@@ -39,8 +39,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /* define if matrix has ghost */
 // #define MATRIX_HAS_GHOST /* 按键阵列是否出现Ghost Key，若没有加二极管则需要启用这个项目 */
 
-/* Set 0 if debouncing isn't needed */
-#define DEBOUNCE 5 /* 硬件消抖次数 */
+#define DEBOUNCE 5 /* 硬件消抖次数，设置为0则不消抖 */
 
 /* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
 #define LOCKING_SUPPORT_ENABLE
@@ -52,8 +51,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)))
 
 // 定义Bootmagic按键
-#define BOOTMAGIC_KEY_BOOT KC_U /* 开机按键 */
-#define BOOTMAGIC_KEY_ERASE_BOND KC_E /* 删除所有绑定的按键 */
+#define BOOTMAGIC_KEY_BOOT KC_U /* 开机 */
+#define BOOTMAGIC_KEY_ERASE_BOND KC_E /* 删除所有绑定 */
 
 // 键盘省电参数
 #define SLEEP_SLOW_TIMEOUT 15 // 键盘闲置多久后转入慢速扫描模式 (s)
@@ -62,8 +61,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define KEYBOARD_FAST_SCAN_INTERVAL 10 // 通常模式下，多久扫描一次键盘 (ms)
 #define KEYBOARD_SLOW_SCAN_INTERVAL 100 // 慢速模式下，多久扫描一次键盘 (ms)
 
-// 自动发射功率调整
-#define DYNAMIC_TX_POWER
+#define DYNAMIC_TX_POWER /* 启用自动发射功率调整 */
 
 // LED自动熄灭时长(ms)，设为0则不自动熄灭
 #define LED_AUTOOFF_TIME 5000
@@ -88,32 +86,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_FUNCTION
 
 // LED 配置
+#define LED_NUM 22
 #define LED_CAPS 21
-
-// 启用 RGB LED 指示
-#define LED_RGB
-#define LED_RGB_R 22
-#define LED_RGB_G 23
-#define LED_RGB_B 24
+#define LED_SCLK 23
+#define LED_POSITIVE // LED上拉驱动
 
 // USB UART 传输配置
-#define HAS_USB
-#define UART_RXD 17
-#define UART_TXD 18
-#define UART_DET 19
-#define UART_BAUDRATE NRF_UART_BAUDRATE_57600
+#define HAS_USB // 启用与CH554的通信支持
+#define UART_RXD 17 // UART_RX口IO
+#define UART_TXD 18 // UART_TX口IO
+#define UART_DET 19 // UART 检测引脚，若此脚被拉低，则说明USB正在工作。若不配置则使用RX口作为检测引脚
+#define UART_BAUDRATE NRF_UART_BAUDRATE_57600 // 通信波特率，请不要修改
 
 // 电量检测配置
-#define BATTERY_ADC_PIN NRF_SAADC_INPUT_AIN0
+#define BATTERY_ADC_PIN NRF_SAADC_INPUT_AIN0 // 电量检测引脚
 
 // 充电检测配置
-#define PIN_CHARGING !UCC1
-#define PIN_STANDBY !UCC2
+#define PIN_CHARGING !UCC1 // CH554的充电检测。当UCC1拉低时表示正在充电
+#define PIN_STANDBY !UCC2 // CH554的充电检测。当UCC2拉低时表示充电完成。若不配置则只使用PIN_CHARGING作为是否充电的检测标志
 
 // 按键阵列配置
 static const uint8_t row_pin_array[MATRIX_ROWS] = { 25, 28, 29, 30, 26 };
 static const uint8_t column_pin_array[MATRIX_COLS] = { 16, 15, 14, 13, 12, 11, 27, 3, 4, 5, 6, 7, 8, 9 };
 
-#define ROW_IN // 二极管方向是从COL->ROW
-
-#define LED_POSITIVE // LED上拉驱动
+#define ROW_IN // 键盘阵列的二极管方向是从COL->ROW
