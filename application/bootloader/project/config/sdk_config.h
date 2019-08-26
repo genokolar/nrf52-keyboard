@@ -137,7 +137,7 @@
 // <31=> 31 (P0.31) 
 
 #ifndef NRF_BL_DFU_ENTER_METHOD_BUTTON_PIN
-#define NRF_BL_DFU_ENTER_METHOD_BUTTON_PIN 10
+#define NRF_BL_DFU_ENTER_METHOD_BUTTON_PIN 3
 #endif
 
 // </e>
@@ -1264,7 +1264,7 @@
 // <i> firmware upgrade. The size must be a multiple of the flash page size.
 
 #ifndef NRF_DFU_APP_DATA_AREA_SIZE
-#define NRF_DFU_APP_DATA_AREA_SIZE 8192
+#define NRF_DFU_APP_DATA_AREA_SIZE 0
 #endif
 
 // <q> NRF_DFU_IN_APP  - Specifies that this code is in the app, not the bootloader, so some settings are off-limits.
@@ -1625,7 +1625,7 @@
  
 
 #ifndef NRF_MEMOBJ_ENABLED
-#define NRF_MEMOBJ_ENABLED 0
+#define NRF_MEMOBJ_ENABLED 1
 #endif
 
 // <e> NRF_QUEUE_ENABLED - nrf_queue - Queue module
@@ -1655,6 +1655,26 @@
 #ifndef NRF_STRERROR_ENABLED
 #define NRF_STRERROR_ENABLED 1
 #endif
+
+// <h> nrf_fprintf - fprintf function.
+
+//==========================================================
+// <q> NRF_FPRINTF_ENABLED  - Enable/disable fprintf module.
+ 
+
+#ifndef NRF_FPRINTF_ENABLED
+#define NRF_FPRINTF_ENABLED 0
+#endif
+
+// <q> NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED  - For each printed LF, function will add CR.
+ 
+
+#ifndef NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED
+#define NRF_FPRINTF_FLAG_AUTOMATIC_CR_ON_LF_ENABLED 0
+#endif
+
+// </h> 
+//==========================================================
 
 // </h> 
 //==========================================================
@@ -4533,6 +4553,13 @@
 //==========================================================
 
 // </e>
+
+// <q> NRF_LOG_STR_FORMATTER_TIMESTAMP_FORMAT_ENABLED  - nrf_log_str_formatter - Log string formatter
+ 
+
+#ifndef NRF_LOG_STR_FORMATTER_TIMESTAMP_FORMAT_ENABLED
+#define NRF_LOG_STR_FORMATTER_TIMESTAMP_FORMAT_ENABLED 0
+#endif
 
 // </h> 
 //==========================================================

@@ -1,18 +1,18 @@
-PROJECT_NAME     := secure_bootloader_ble_s112_pca10040e
-TARGETS          := nrf52810_xxaa_s112
+PROJECT_NAME     := secure_bootloader_ble_s132_pca10040
+TARGETS          := nrf52832_xxaa_bootloader
 OUTPUT_DIRECTORY := _build
 
 SDK_ROOT := ../../../../SDK
 PROJ_DIR := ../..
 TEMPLATE_PATH := ../../../../template
 
-$(OUTPUT_DIRECTORY)/nrf52810_xxaa_s112.out: \
+$(OUTPUT_DIRECTORY)/nrf52832_xxaa_bootloader.out: \
 	LINKER_SCRIPT  := secure_bootloader_gcc_nrf52.ld
 
 # Source files common to all targets
 SRC_FILES += \
-	$(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52810.S \
-	$(SDK_ROOT)/modules/nrfx/mdk/system_nrf52810.c \
+	$(SDK_ROOT)/modules/nrfx/mdk/gcc_startup_nrf52.S \
+	$(SDK_ROOT)/modules/nrfx/mdk/system_nrf52.c \
 	$(SDK_ROOT)/components/libraries/util/app_error_weak.c \
 	$(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
 	$(SDK_ROOT)/components/libraries/util/app_util_platform.c \
@@ -102,7 +102,7 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/libraries/bootloader/dfu \
 	$(SDK_ROOT)/components/ble/common \
 	$(SDK_ROOT)/components/libraries/delay \
-	$(SDK_ROOT)/components/softdevice/s112/headers/nrf52 \
+	$(SDK_ROOT)/components/softdevice/s132/headers/nrf52 \
 	$(SDK_ROOT)/components/libraries/svc \
 	$(SDK_ROOT)/components/libraries/stack_info \
 	$(SDK_ROOT)/components/libraries/crypto/backend/nrf_hw \
@@ -110,7 +110,7 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/external/nrf_oberon \
 	$(SDK_ROOT)/components/libraries/strerror \
 	$(SDK_ROOT)/components/libraries/crypto/backend/mbedtls \
-	$(SDK_ROOT)/components/softdevice/s112/headers \
+	$(SDK_ROOT)/components/softdevice/s132/headers \
 	$(SDK_ROOT)/components/boards \
 	$(SDK_ROOT)/components/libraries/crypto/backend/cc310 \
 	$(SDK_ROOT)/components/libraries/bootloader \
@@ -134,8 +134,8 @@ INC_FOLDERS += \
 
 # Libraries common to all targets
 LIB_FILES += \
-	$(SDK_ROOT)/external/nrf_oberon/lib/cortex-m4/soft-float/liboberon_2.0.7.a \
-	$(SDK_ROOT)/external/micro-ecc/nrf52nf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
+  $(SDK_ROOT)/external/nrf_oberon/lib/cortex-m4/hard-float/liboberon_2.0.7.a \
+  $(SDK_ROOT)/external/micro-ecc/nrf52hf_armgcc/armgcc/micro_ecc_lib_nrf52.a \
 
 # Optimization flags
 OPT = -Os -g3
@@ -145,15 +145,15 @@ OPT = -Os -g3
 # C flags common to all targets
 CFLAGS += $(OPT)
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
-CFLAGS += -DBOARD_PCA10040
-CFLAGS += -DFLOAT_ABI_SOFT
-CFLAGS += -DNRF52810_XXAA
+CFLAGS += -DBOARD_CUSTOM
+CFLAGS += -DFLOAT_ABI_HARD
+CFLAGS += -DNRF52
+CFLAGS += -DNRF52832_XXAA
 CFLAGS += -DNRF52_PAN_74
-CFLAGS += -DNRFX_COREDEP_DELAY_US_LOOP_CYCLES=3
 CFLAGS += -DNRF_DFU_SETTINGS_VERSION=2
 CFLAGS += -DNRF_DFU_SVCI_ENABLED
 CFLAGS += -DNRF_SD_BLE_API_VERSION=6
-CFLAGS += -DS112
+CFLAGS += -DS132
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 CFLAGS += -DuECC_ENABLE_VLI_API=0
@@ -164,7 +164,7 @@ CFLAGS += -DuECC_VLI_NATIVE_LITTLE_ENDIAN=1
 CFLAGS += -mcpu=cortex-m4
 CFLAGS += -mthumb -mabi=aapcs
 CFLAGS += -Wall -Werror
-CFLAGS += -mfloat-abi=soft
+CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # keep every function in a separate section, this allows linker to discard unused ones
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
@@ -176,17 +176,17 @@ CXXFLAGS += $(OPT)
 ASMFLAGS += -g3
 ASMFLAGS += -mcpu=cortex-m4
 ASMFLAGS += -mthumb -mabi=aapcs
-ASMFLAGS += -mfloat-abi=soft
+ASMFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
-ASMFLAGS += -DBOARD_PCA10040
-ASMFLAGS += -DFLOAT_ABI_SOFT
-ASMFLAGS += -DNRF52810_XXAA
+ASMFLAGS += -DBOARD_CUSTOM
+ASMFLAGS += -DFLOAT_ABI_HARD
+ASMFLAGS += -DNRF52
+ASMFLAGS += -DNRF52832_XXAA
 ASMFLAGS += -DNRF52_PAN_74
-ASMFLAGS += -DNRFX_COREDEP_DELAY_US_LOOP_CYCLES=3
 ASMFLAGS += -DNRF_DFU_SETTINGS_VERSION=2
 ASMFLAGS += -DNRF_DFU_SVCI_ENABLED
 ASMFLAGS += -DNRF_SD_BLE_API_VERSION=6
-ASMFLAGS += -DS112
+ASMFLAGS += -DS132
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DSVC_INTERFACE_CALL_AS_NORMAL_FUNCTION
 ASMFLAGS += -DuECC_ENABLE_VLI_API=0
@@ -199,15 +199,14 @@ ASMFLAGS += -DuECC_VLI_NATIVE_LITTLE_ENDIAN=1
 LDFLAGS += $(OPT)
 LDFLAGS += -mthumb -mabi=aapcs -L$(SDK_ROOT)/modules/nrfx/mdk -T$(LINKER_SCRIPT)
 LDFLAGS += -mcpu=cortex-m4
+LDFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 # let linker dump unused sections
 LDFLAGS += -Wl,--gc-sections
 # use newlib in nano version
 LDFLAGS += --specs=nano.specs
 
-nrf52810_xxaa_s112: CFLAGS += -D__HEAP_SIZE=0
-nrf52810_xxaa_s112: CFLAGS += -D__STACK_SIZE=2048
-nrf52810_xxaa_s112: ASMFLAGS += -D__HEAP_SIZE=0
-nrf52810_xxaa_s112: ASMFLAGS += -D__STACK_SIZE=2048
+nrf52832_xxaa_bootloader: CFLAGS += -D__HEAP_SIZE=0
+nrf52832_xxaa_bootloader: ASMFLAGS += -D__HEAP_SIZE=0
 
 # Add standard libraries at the very end of the linker input, after all objects
 # that may need symbols provided by these libraries.
@@ -217,15 +216,16 @@ LIB_FILES += -lc -lnosys -lm
 .PHONY: default help
 
 # Default target - first one defined
-default: nrf52810_xxaa_s112
+default: nrf52832_xxaa_bootloader
 
 # Print all targets that can be built
 help:
 	@echo following targets are available:
-	@echo		nrf52810_xxaa_s112
+	@echo		nrf52832_xxaa_bootloader
 	@echo		flash_softdevice
 	@echo		sdk_config - starting external tool for editing sdk_config.h
 	@echo		flash      - flashing binary
+
 
 
 include $(TEMPLATE_PATH)/Makefile.common
@@ -236,24 +236,24 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 # Flash the program
 flash: default
-	@echo Flashing: $(OUTPUT_DIRECTORY)/nrf52810_xxaa_s112.hex
-	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/nrf52810_xxaa_s112.hex --sectorerase
+	@echo Flashing: $(OUTPUT_DIRECTORY)/nrf52832_xxaa_bootloader.hex
+	nrfjprog -f nrf52 --program $(OUTPUT_DIRECTORY)/nrf52832_xxaa_bootloader.hex --sectorerase
 	nrfjprog -f nrf52 --reset
 
 pyocd_flash: default
-	@echo Flashing: $(OUTPUT_DIRECTORY)/nrf52810_xxaa_s112.hex
-	pyocd flash -t nrf52 -e sector -f 2M $(OUTPUT_DIRECTORY)/nrf52810_xxaa_s112.hex
+	@echo Flashing: $(OUTPUT_DIRECTORY)/nrf52832_xxaa_bootloader.hex
+	pyocd flash -t nrf52 -e sector -f 2M $(OUTPUT_DIRECTORY)/nrf52832_xxaa_bootloader.hex
 	pyocd cmd -t nrf52 -c reset
 
 # Flash softdevice
 flash_softdevice:
-	@echo Flashing: s112_nrf52_6.1.1_softdevice.hex
-	nrfjprog -f nrf52 --program $(SDK_ROOT)/components/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex --sectorerase
+	@echo Flashing: s132_nrf52_6.1.1_softdevice.hex
+	nrfjprog -f nrf52 --program $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_6.1.1_softdevice.hex --sectorerase
 	nrfjprog -f nrf52 --reset
 
 pyocd_flash_softdevice:
-	@echo Flashing: s112_nrf52_6.1.1_softdevice.hex
-	pyocd flash -t nrf52 -e sector -f 2M $(SDK_ROOT)/components/softdevice/s112/hex/s112_nrf52_6.1.1_softdevice.hex
+	@echo Flashing: s132_nrf52_6.1.1_softdevice.hex
+	pyocd flash -t nrf52 -e sector -f 2M $(SDK_ROOT)/components/softdevice/s132/hex/s132_nrf52_6.1.1_softdevice.hex
 	pyocd cmd -t nrf52 -c reset
 
 erase:
