@@ -1,15 +1,11 @@
-# GT BLE60 键盘
+# Farad69 键盘
 
 ## 描述
 
-- 5x14的60%键盘
+- 5x15的60%键盘，40%+Pad的布局
 - 一个Caps灯和三个单色状态指示灯
 - Type-C接口
 - 蓝牙主控为nRF52832
-
-## 硬件
-
-参见 [GT_BLE60_Keyboard_PCB](https://github.com/genokolar/GT_BLE60_Keyboard_PCB)。
 
 ## 默认指示灯说明
 
