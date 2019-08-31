@@ -100,6 +100,7 @@ bool command_extra(uint8_t code)
         app_timer_start(bonds_run_timer, APP_TIMER_TICKS(1000), NULL);
         break;
     //多设备切换：支持4台设备切换
+#ifdef Multi_DEVICE_SWITCH
     case KC_Q:
         clear_keyboard();
         devices_id = 0;
@@ -120,6 +121,12 @@ bool command_extra(uint8_t code)
         devices_id = 3;
         app_timer_start(devices_run_timer, APP_TIMER_TICKS(200), NULL);
         break;
+#else
+    case KC_R:
+        clear_keyboard();
+        restart_advertising_no_whitelist();
+        break;
+#endif
     case KC_B:
         //重启到DFU模式
         clear_keyboard();

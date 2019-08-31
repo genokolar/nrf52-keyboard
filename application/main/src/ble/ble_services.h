@@ -23,7 +23,7 @@ void delete_bonds(void);
 
 void delete_bond_id(uint8_t id);
 void restart_advertising_id(uint8_t id);
-void restart_advertising_wo_whitelist();
+void restart_advertising_no_whitelist();
 
 /**@brief Init Bluetooth stack
  */

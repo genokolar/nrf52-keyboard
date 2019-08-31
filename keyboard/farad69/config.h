@@ -73,6 +73,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HIGH_TX_POWER
 // 动态连接功率
 // #define DYNAMIC_TX_POWER
+// 启用多设备切换
+// #define Multi_DEVICE_SWITCH
 
 // 启用看门狗
 #define ENABLE_WATCHDOG

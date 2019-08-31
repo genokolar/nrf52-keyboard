@@ -40,14 +40,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "ble_config.h"
 
-#define PNP_ID_VENDOR_ID_SOURCE 0x02 /**< Vendor ID Source. */
-
 #define APP_BLE_OBSERVER_PRIO 3 /**< Application's BLE observer priority. You shouldn't need to modify this value. */
 #define APP_BLE_CONN_CFG_TAG 1 /**< A tag identifying the SoftDevice BLE configuration. */
-
-#define FIRST_CONN_PARAMS_UPDATE_DELAY APP_TIMER_TICKS(5000) /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
-#define NEXT_CONN_PARAMS_UPDATE_DELAY APP_TIMER_TICKS(30000) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
-#define MAX_CONN_PARAMS_UPDATE_COUNT 3 /**< Number of attempts before giving up the connection parameter negotiation. */
+#define PNP_ID_VENDOR_ID_SOURCE 0x02 /**< Vendor ID Source. */
 
 #define APP_ADV_FAST_INTERVAL 0x0028 /**< Fast advertising interval (in units of 0.625 ms. This value corresponds to 25 ms.). */
 #define APP_ADV_SLOW_INTERVAL 0x0C80 /**< Slow advertising interval (in units of 0.625 ms. This value corrsponds to 2 seconds). */
@@ -61,10 +56,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define SLAVE_LATENCY 6 /**< Slave latency. */
 #define CONN_SUP_TIMEOUT MSEC_TO_UNITS(430, UNIT_10_MS) /**< Connection supervisory timeout (430 ms). */
 
+#define FIRST_CONN_PARAMS_UPDATE_DELAY APP_TIMER_TICKS(5000) /**< Time from initiating event (connect or start of notification) to first time sd_ble_gap_conn_param_update is called (5 seconds). */
+#define NEXT_CONN_PARAMS_UPDATE_DELAY APP_TIMER_TICKS(30000) /**< Time between each call to sd_ble_gap_conn_param_update after the first call (30 seconds). */
+#define MAX_CONN_PARAMS_UPDATE_COUNT 3 /**< Number of attempts before giving up the connection parameter negotiation. */
+
 uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current connection. */
 static pm_peer_id_t m_peer_id; /**< Device reference handle to the current bonded central. */
-static uint32_t m_whitelist_peer_cnt; /**< Number of peers currently in the whitelist. */
-static pm_peer_id_t m_whitelist_peers[BLE_GAP_WHITELIST_ADDR_MAX_COUNT]; /**< List of peers currently in the whitelist. */
+static uint32_t      m_whitelist_peer_cnt;                                  /**< Number of peers currently in the whitelist. */
+static pm_peer_id_t  m_whitelist_peers[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];   /**< List of peers currently in the whitelist. */
 
 NRF_BLE_GATT_DEF(m_gatt); /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr); /**< Context for the Queued Write module.*/
@@ -73,6 +72,38 @@ BLE_ADVERTISING_DEF(m_advertising); /**< Advertising module instance. */
 static ble_uuid_t m_adv_uuids[] = { { BLE_UUID_HUMAN_INTERFACE_DEVICE_SERVICE, BLE_UUID_TYPE_BLE } };
 
 static evt_handler event_handler;
+
+/**@brief Function for setting filtered whitelist.
+ *
+ * @param[in] skip  Filter passed to @ref pm_peer_id_list.
+ */
+static void whitelist_set(pm_peer_id_list_skip_t skip)
+{
+    pm_peer_id_t peer_ids[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];
+    uint32_t peer_id_count = BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
+
+    ret_code_t err_code = pm_peer_id_list(peer_ids, &peer_id_count, PM_PEER_ID_INVALID, skip);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = pm_whitelist_set(peer_ids, peer_id_count);
+    APP_ERROR_CHECK(err_code);
+}
+
+/**@brief Function for setting filtered device identities.
+ *
+ * @param[in] skip  Filter passed to @ref pm_peer_id_list.
+ */
+static void identities_set(pm_peer_id_list_skip_t skip)
+{
+    pm_peer_id_t peer_ids[BLE_GAP_DEVICE_IDENTITIES_MAX_COUNT];
+    uint32_t peer_id_count = BLE_GAP_DEVICE_IDENTITIES_MAX_COUNT;
+
+    ret_code_t err_code = pm_peer_id_list(peer_ids, &peer_id_count, PM_PEER_ID_INVALID, skip);
+    APP_ERROR_CHECK(err_code);
+
+    err_code = pm_device_identities_list_set(peer_ids, peer_id_count);
+    APP_ERROR_CHECK(err_code);
+}
 
 void ble_disconnect()
 {
@@ -151,6 +182,8 @@ void advertising_start(bool erase_bonds)
         delete_bonds();
         // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
     } else {
+        whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
+
         ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
         APP_ERROR_CHECK(ret);
     }
@@ -173,7 +206,7 @@ static void advertising_config_get(ble_adv_modes_config_t* p_config)
 {
     memset(p_config, 0, sizeof(ble_adv_modes_config_t));
 
-    p_config->ble_adv_whitelist_enabled = false;
+    p_config->ble_adv_whitelist_enabled = true;
     p_config->ble_adv_directed_high_duty_enabled = true;
     p_config->ble_adv_directed_enabled = false;
     p_config->ble_adv_directed_interval = 0;
@@ -243,7 +276,6 @@ static void pm_evt_handler(pm_evt_t const* p_evt)
         m_peer_id = p_evt->peer_id;
         event_handler(USER_BLE_CONNECTED);
         break;
-
     case PM_EVT_BONDED_PEER_CONNECTED:
         event_handler(USER_BLE_CONNECTED);
         break;
@@ -253,23 +285,10 @@ static void pm_evt_handler(pm_evt_t const* p_evt)
         break;
 
     case PM_EVT_PEER_DATA_UPDATE_SUCCEEDED:
-        if (p_evt->params.peer_data_update_succeeded.flash_changed
-            && (p_evt->params.peer_data_update_succeeded.data_id == PM_PEER_DATA_ID_BONDING)) {
+        if (p_evt->params.peer_data_update_succeeded.flash_changed && (p_evt->params.peer_data_update_succeeded.data_id == PM_PEER_DATA_ID_BONDING)) {
             // Note: You should check on what kind of white list policy your application should use.
 
-            if (m_whitelist_peer_cnt < BLE_GAP_WHITELIST_ADDR_MAX_COUNT) {
-                // Bonded to a new peer, add it to the whitelist.
-                m_whitelist_peers[m_whitelist_peer_cnt++] = m_peer_id;
-
-                // The whitelist has been modified, update it in the Peer Manager.
-                ret_code_t err_code = pm_device_identities_list_set(m_whitelist_peers, m_whitelist_peer_cnt);
-                if (err_code != NRF_ERROR_NOT_SUPPORTED) {
-                    APP_ERROR_CHECK(err_code);
-                }
-
-                err_code = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
-                APP_ERROR_CHECK(err_code);
-            }
+            whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
         }
         break;
 
@@ -278,37 +297,14 @@ static void pm_evt_handler(pm_evt_t const* p_evt)
     }
 }
 
-void restart_advertising_wo_whitelist()
+void restart_advertising_no_whitelist()
 {
-    uint32_t err_code;
-
-    sd_ble_gap_adv_stop(m_advertising.adv_handle);
-
-    ble_adv_modes_config_t options;
-    memset(&options, 0, sizeof(options));
-    options.ble_adv_whitelist_enabled = false;
-    options.ble_adv_directed_high_duty_enabled = false;
-    options.ble_adv_directed_enabled = false;
-    options.ble_adv_fast_enabled = true;
-    options.ble_adv_fast_interval = APP_ADV_FAST_INTERVAL;
-    options.ble_adv_fast_timeout = APP_ADV_FAST_DURATION;
-    options.ble_adv_slow_enabled = true;
-    options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
-    options.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
-    ble_advertising_modes_config_set(&m_advertising, &options);
-
-    if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
-        err_code = sd_ble_gap_disconnect(m_conn_handle,
-            BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+    ret_code_t err_code;
+    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
+        err_code = ble_advertising_restart_without_whitelist(&m_advertising);
         if (err_code != NRF_ERROR_INVALID_STATE) {
             APP_ERROR_CHECK(err_code);
         }
-    } else {
-        err_code = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-    }
-
-    if (err_code != NRF_ERROR_INVALID_STATE) {
-        APP_ERROR_CHECK(err_code);
     }
 }
 
@@ -370,6 +366,7 @@ void restart_advertising_id(uint8_t id)
     APP_ERROR_CHECK(ret);
 }
 
+/*
 static void whitelist_load(void)
 {
     ret_code_t ret;
@@ -388,7 +385,8 @@ static void whitelist_load(void)
 
     ret = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
     APP_ERROR_CHECK(ret);
-}
+} 
+*/
 
 #ifdef MACADDR_SEPRATOR
 static void get_device_name(char* device_name, int offset)
@@ -592,6 +590,8 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
         err_code = pm_whitelist_get(whitelist_addrs, &addr_cnt,
             whitelist_irks, &irk_cnt);
         APP_ERROR_CHECK(err_code);
+        // Set the correct identities list (no excluding peers with no Central Address Resolution).
+        identities_set(PM_PEER_ID_LIST_SKIP_NO_IRK);
 
         // Apply the whitelist.
         err_code = ble_advertising_whitelist_reply(&m_advertising,
@@ -610,6 +610,9 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
             err_code = pm_peer_data_bonding_load(m_peer_id, &peer_bonding_data);
             if (err_code != NRF_ERROR_NOT_FOUND) {
                 APP_ERROR_CHECK(err_code);
+
+                // Manipulate identities to exclude peers with no Central Address Resolution.
+                identities_set(PM_PEER_ID_LIST_SKIP_ALL);
 
                 ble_gap_addr_t* p_peer_addr = &(peer_bonding_data.peer_ble_id.id_addr_info);
                 err_code = ble_advertising_peer_addr_reply(&m_advertising, p_peer_addr);
@@ -834,7 +837,7 @@ void ble_services_init(evt_handler handler)
     peer_manager_init();
     gap_params_init();
     gatt_init();
-    whitelist_load();
+    // whitelist_load();
     advertising_init();
     // services
     qwr_init();
