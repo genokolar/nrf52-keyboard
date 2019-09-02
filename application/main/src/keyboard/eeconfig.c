@@ -23,23 +23,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define RECORD_KEY 0x0514 /* A key for the first record. */
 
 __ALIGN(4)
-static uint8_t config_buffer[8] __attribute__((aligned(4))) = { EECONFIG_MAGIC_NUMBER >> 8, EECONFIG_MAGIC_NUMBER % 0x100, 0, 0, 0, 0, 0, 0 };
+static uint8_t config_buffer[12] __attribute__((aligned(4))) = { EECONFIG_MAGIC_NUMBER >> 8, EECONFIG_MAGIC_NUMBER % 0x100, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static bool fds_inited = false;
 
-static fds_record_t record;
-static fds_record_desc_t record_desc;
+static fds_record_t record = {0};
+static fds_record_desc_t record_desc = {0};
 
 static void eeconfig_set_default()
 {
     config_buffer[0] = EECONFIG_MAGIC_NUMBER >> 8;
     config_buffer[1] = EECONFIG_MAGIC_NUMBER % 0x100;
-    config_buffer[2] = 0;
-    config_buffer[3] = 0;
-    config_buffer[4] = 0;
-    config_buffer[5] = 0;
-#ifdef BACKLIGHT_ENABLE
-    config_buffer[6] = 0;
-#endif
+    config_buffer[2] = 0; //debug
+    config_buffer[3] = 0; //default layer
+    config_buffer[4] = 0; //keymap
+    config_buffer[5] = 0; //switch device id
+    config_buffer[6] = 0; //backlight
+    config_buffer[7] = 0; //no use
+    config_buffer[8] = 0; //ws2812
 }
 
 /**
@@ -52,7 +52,7 @@ static void config_update()
     record.file_id = FILE_ID;
     record.key = RECORD_KEY;
     record.data.p_data = &config_buffer;
-    record.data.length_words = 2; /* one word is four bytes. */
+    record.data.length_words = 3; /* one word is four bytes. */
 
     // record_desc was create by fds_record_find or fds_record_write
     ret_code_t rc = fds_record_update(&record_desc, &record);
@@ -71,7 +71,7 @@ static void config_write()
     record.file_id = FILE_ID;
     record.key = RECORD_KEY;
     record.data.p_data = &config_buffer;
-    record.data.length_words = 2; /* one word is four bytes. */
+    record.data.length_words = 3; /* one word is four bytes. */
 
     ret_code_t rc;
     rc = fds_record_write(&record_desc, &record);
@@ -86,14 +86,14 @@ static void config_write()
  */
 static void config_read()
 {
-    fds_find_token_t ftok;
-    fds_flash_record_t flash_record;
+    fds_find_token_t ftok = {0};
+    fds_flash_record_t flash_record = {0};
     /* It is required to zero the token before first use. */
     memset(&ftok, 0x00, sizeof(fds_find_token_t));
 
     if (fds_record_find(FILE_ID, RECORD_KEY, &record_desc, &ftok) == FDS_SUCCESS) {
         fds_record_open(&record_desc, &flash_record);
-        memcpy(config_buffer, flash_record.p_data, 8);
+        memcpy(config_buffer, flash_record.p_data, 12);
         fds_record_close(&record_desc);
     } else {
         config_write();
@@ -166,6 +166,18 @@ void eeconfig_write_keymap(uint8_t val)
     }
 }
 
+uint8_t eeconfig_read_switch_id(void)
+{
+    return config_buffer[5];
+}
+void eeconfig_write_switch_id(uint8_t val)
+{
+    if (config_buffer[5] != val) {
+        config_buffer[5] = val;
+        config_update();
+    }
+}
+
 #ifdef BACKLIGHT_ENABLE
 uint8_t eeconfig_read_backlight(void)
 {
@@ -175,6 +187,26 @@ void eeconfig_write_backlight(uint8_t val)
 {
     if (config_buffer[6] != val) {
         config_buffer[6] = val;
+        config_update();
+    }
+}
+#endif
+#ifdef RGBLIGHT_ENABLE
+uint32_t eeconfig_read_rgblight(void)
+{
+    return config_buffer[11] | (config_buffer[10] << 8)
+        | (config_buffer[9] << 16) | (config_buffer[8] << 24);
+}
+
+void eeconfig_write_rgblight(uint32_t val)
+{
+    if ((config_buffer[11] | (config_buffer[10] << 8)
+            | (config_buffer[9] << 16) | (config_buffer[8] << 24))
+        != val) {
+        config_buffer[11] = (val % 0x100);
+        config_buffer[10] = (val >> 8);
+        config_buffer[9] = (val >> 16);
+        config_buffer[8] = (val >> 24);
         config_update();
     }
 }

@@ -29,8 +29,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define EECONFIG_DEBUG                              (uint8_t *)2
 #define EECONFIG_DEFAULT_LAYER                      (uint8_t *)3
 #define EECONFIG_KEYMAP                             (uint8_t *)4
-#define EECONFIG_MOUSEKEY_ACCEL                     (uint8_t *)5
+#define EECONFIG_SWITCH_ID                          (uint8_t *)5
 #define EECONFIG_BACKLIGHT                          (uint8_t *)6
+#define EECONFIG_RGBLIGHT                           (uint32_t *)8
 
 
 /* debug bit */
@@ -67,9 +68,17 @@ void eeconfig_write_default_layer(uint8_t val);
 uint8_t eeconfig_read_keymap(void);
 void eeconfig_write_keymap(uint8_t val);
 
+uint8_t eeconfig_read_switch_id(void);
+void eeconfig_write_switch_id(uint8_t val);
+
 #ifdef BACKLIGHT_ENABLE
 uint8_t eeconfig_read_backlight(void);
 void eeconfig_write_backlight(uint8_t val);
+#endif
+
+#ifdef RGBLIGHT_ENABLE
+uint32_t eeconfig_read_rgblight(void);
+void eeconfig_write_rgblight(uint32_t val);
 #endif
 
 #endif

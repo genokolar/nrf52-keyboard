@@ -37,7 +37,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 APP_TIMER_DEF(bootloader_run_timer);
 APP_TIMER_DEF(bonds_run_timer);
 APP_TIMER_DEF(devices_run_timer);
+#ifdef Multi_DEVICE_SWITCH
 uint8_t devices_id = 0;
+#endif
 
 /**
  * @brief command运行handler
@@ -51,12 +53,17 @@ static void bootloader_handler(void* p_context)
 
 static void bonds_handler(void* p_context)
 {
+#ifdef Multi_DEVICE_SWITCH
+    delete_bond_id(devices_id);
+    switch_device_id(devices_id);
+#else
     delete_bonds();
+#endif
 }
 
 static void devices_handler(void* p_context)
 {
-    restart_advertising_id(devices_id);
+    switch_device_id(devices_id);
 }
 
 /**
@@ -87,7 +94,7 @@ bool command_extra(uint8_t code)
 #endif
         break;
     case KC_L:
-	case KC_SLSH:
+    case KC_SLSH:
         //显示状态灯
         if (!usb_working()) {
             clear_keyboard();
@@ -99,7 +106,7 @@ bool command_extra(uint8_t code)
         clear_keyboard();
         app_timer_start(bonds_run_timer, APP_TIMER_TICKS(1000), NULL);
         break;
-    //多设备切换：支持4台设备切换
+        //多设备切换：支持3台设备切换
 #ifdef Multi_DEVICE_SWITCH
     case KC_Q:
         clear_keyboard();
@@ -116,17 +123,11 @@ bool command_extra(uint8_t code)
         devices_id = 2;
         app_timer_start(devices_run_timer, APP_TIMER_TICKS(200), NULL);
         break;
-    case KC_R:
-        clear_keyboard();
-        devices_id = 3;
-        app_timer_start(devices_run_timer, APP_TIMER_TICKS(200), NULL);
-        break;
-#else
+#endif
     case KC_R:
         clear_keyboard();
         restart_advertising_no_whitelist();
         break;
-#endif
     case KC_B:
         //重启到DFU模式
         clear_keyboard();

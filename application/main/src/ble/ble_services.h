@@ -24,6 +24,7 @@ void delete_bonds(void);
 void delete_bond_id(uint8_t id);
 void restart_advertising_id(uint8_t id);
 void restart_advertising_no_whitelist();
+void switch_device_id(uint8_t id);
 
 /**@brief Init Bluetooth stack
  */

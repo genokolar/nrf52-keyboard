@@ -37,6 +37,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "nrf_sdh_ble.h"
 #include "nrf_sdh_soc.h"
 #include "peer_manager_handler.h"
+#include "eeconfig.h"
 
 #include "ble_config.h"
 
@@ -64,6 +65,7 @@ uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current con
 static pm_peer_id_t m_peer_id; /**< Device reference handle to the current bonded central. */
 static uint32_t      m_whitelist_peer_cnt;                                  /**< Number of peers currently in the whitelist. */
 static pm_peer_id_t  m_whitelist_peers[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];   /**< List of peers currently in the whitelist. */
+uint8_t switch_id = 0; /** 当前设备ID Device ID of currently in the eeconfig   */
 
 NRF_BLE_GATT_DEF(m_gatt); /**< GATT module instance. */
 NRF_BLE_QWR_DEF(m_qwr); /**< Context for the Queued Write module.*/
@@ -352,18 +354,40 @@ void restart_advertising_id(uint8_t id)
     if (ret != NRF_ERROR_NOT_SUPPORTED) {
         APP_ERROR_CHECK(ret);
     }
-    /*
-    ret = pm_id_addr_get(&gap_addr);
-    APP_ERROR_CHECK(ret);
 
-    gap_addr.addr[3] = id + 1; // switch status 1, 2, or 3
-
-    ret = pm_id_addr_set(&gap_addr);
-    APP_ERROR_CHECK(ret);
-    */
     ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
 
     APP_ERROR_CHECK(ret);
+}
+
+void switch_device_id(uint8_t id)
+{
+    ret_code_t ret;
+    ble_gap_addr_t gap_addr;
+    switch_id = id;
+
+    eeconfig_write_switch_id(id);
+
+    ret = pm_id_addr_get(&gap_addr);
+    APP_ERROR_CHECK(ret);
+
+    gap_addr.addr[3] = id; // switch status 1, 2, or 3
+
+    ret = pm_id_addr_set(&gap_addr);
+    APP_ERROR_CHECK(ret);
+
+    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
+        sd_ble_gap_adv_stop(m_advertising.adv_handle);
+        ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+    } else {
+        sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+    }
+}
+
+static void switch_device_init()
+{
+    switch_id = eeconfig_read_switch_id();
+    switch_device_id(switch_id);
 }
 
 /*
@@ -837,7 +861,7 @@ void ble_services_init(evt_handler handler)
     peer_manager_init();
     gap_params_init();
     gatt_init();
-    // whitelist_load();
+    switch_device_init();
     advertising_init();
     // services
     qwr_init();
