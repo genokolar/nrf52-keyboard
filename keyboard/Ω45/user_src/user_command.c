@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode.h"
 #include "keymap.h"
 #include "main.h"
+#include "rgblight.h"
 #include "status_led.h"
 #include "usb_comm.h"
 #include "user_func.h"
@@ -101,7 +102,7 @@ bool command_extra(uint8_t code)
             status_led_display();
         }
         break;
-    case KC_D:
+    case KC_O:
         //清空绑定数据
         clear_keyboard();
         app_timer_start(bonds_run_timer, APP_TIMER_TICKS(1000), NULL);
@@ -127,6 +128,31 @@ bool command_extra(uint8_t code)
     case KC_R:
         clear_keyboard();
         restart_advertising_no_whitelist();
+        break;
+        //RGB灯控制
+    case KC_Z:
+        rgblight_step();
+        break;
+    case KC_X:
+        rgblight_toggle();
+        break;
+    case KC_C:
+        rgblight_increase_hue();
+        break;
+    case KC_V:
+        rgblight_decrease_hue();
+        break;
+    case KC_A:
+        rgblight_increase_sat();
+        break;
+    case KC_S:
+        rgblight_decrease_sat();
+        break;
+    case KC_D:
+        rgblight_increase_val();
+        break;
+    case KC_F:
+        rgblight_decrease_val();
         break;
     case KC_B:
         //重启到DFU模式

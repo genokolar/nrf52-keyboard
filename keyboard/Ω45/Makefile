@@ -15,6 +15,7 @@ CONFIG_H = config.h
 INC_FOLDERS += \
     . \
 	$(USER_SRC_DIR) \
+	$(USER_SRC_DIR)/ws2812 \
 	$(APP_SRC_DIR)/ble
 
 SRC_FILES += \
@@ -23,6 +24,9 @@ SRC_FILES += \
 	$(USER_SRC_DIR)/status_led.c \
 	$(USER_SRC_DIR)/user_fn.c \
 	$(USER_SRC_DIR)/user_func.c \
+	$(USER_SRC_DIR)/ws2812/ws2812.c \
+	$(USER_SRC_DIR)/ws2812/rgblight.c \
+	$(USER_SRC_DIR)/ws2812/led_tables.c \
 	$(USER_SRC_DIR)/user_bootmagic.c
 
 # 配置项：功能选项

@@ -95,12 +95,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // LED 配置
 #define LED_CAPS 4  //caps led ：5 ； led1、2、3、4：19、20、27、26
 
-
-//#define RGB_WS2812 8 预留
+// ws2812 RGB 配置
+#define RGBLIGHT_ENABLE
+#define RGB_DI_PIN 10
+#define RGBLED_NUM 8
+#define PROGMEM // arm-gcc does not interpret PROGMEM
+#define RGBLIGHT_ANIMATIONS
 
 // 启用 LED 状态灯
 #define LED_BLE 19
-#define LED_CHARGING 10
+//#define LED_CHARGING 10
 #define LED_USB 20
 
 // 独立硬件按钮
