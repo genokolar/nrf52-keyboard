@@ -63,8 +63,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 uint16_t m_conn_handle = BLE_CONN_HANDLE_INVALID; /**< Handle of the current connection. */
 static pm_peer_id_t m_peer_id; /**< Device reference handle to the current bonded central. */
-static uint32_t      m_whitelist_peer_cnt;                                  /**< Number of peers currently in the whitelist. */
-static pm_peer_id_t  m_whitelist_peers[BLE_GAP_WHITELIST_ADDR_MAX_COUNT];   /**< List of peers currently in the whitelist. */
 uint8_t switch_id = 0; /** 当前设备ID Device ID of currently in the eeconfig   */
 
 NRF_BLE_GATT_DEF(m_gatt); /**< GATT module instance. */
@@ -155,27 +153,53 @@ NRF_SDH_STATE_OBSERVER(m_buttonless_dfu_state_obs, 0) = {
     .handler = buttonless_dfu_sdh_state_observer,
 };
 
-/**@brief Fetch the list of peer manager peer IDs.
+/**@brief 切换连接设备.
  *
- * @param[inout] p_peers   The buffer where to store the list of peer IDs.
- * @param[inout] p_size    In: The size of the @p p_peers buffer.
- *                         Out: The number of peers copied in the buffer.
+ * @param[in] id  要切换的设备的ID号
  */
-static void peer_list_get(pm_peer_id_t* p_peers, uint32_t* p_size)
+void switch_device_id(uint8_t id)
 {
-    pm_peer_id_t peer_id;
-    uint32_t peers_to_copy;
+    ret_code_t ret;
+    ble_gap_addr_t gap_addr;
+    switch_id = id;
 
-    peers_to_copy = (*p_size < BLE_GAP_WHITELIST_ADDR_MAX_COUNT) ? *p_size : BLE_GAP_WHITELIST_ADDR_MAX_COUNT;
+    eeconfig_write_switch_id(id);
 
-    peer_id = pm_next_peer_id_get(PM_PEER_ID_INVALID);
-    *p_size = 0;
+    ret = pm_id_addr_get(&gap_addr);
+    APP_ERROR_CHECK(ret);
 
-    while ((peer_id != PM_PEER_ID_INVALID) && (peers_to_copy--)) {
-        p_peers[(*p_size)++] = peer_id;
-        peer_id = pm_next_peer_id_get(peer_id);
+    gap_addr.addr[3] = id; // switch status 1, 2, or 3
+
+    ret = pm_id_addr_set(&gap_addr);
+    APP_ERROR_CHECK(ret);
+
+    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
+        sd_ble_gap_adv_stop(m_advertising.adv_handle);
+        ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+    } else {
+        sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
     }
 }
+/**@brief 切换连接设备初始化.
+ *
+ * 读取存储的当前连接设备ID，并激活为当前连接设备
+ */
+static void switch_device_init()
+{
+
+    ret_code_t ret;
+    ble_gap_addr_t gap_addr;
+    switch_id = eeconfig_read_switch_id();
+
+    ret = pm_id_addr_get(&gap_addr);
+    APP_ERROR_CHECK(ret);
+
+    gap_addr.addr[3] = switch_id;
+
+    ret = pm_id_addr_set(&gap_addr);
+    APP_ERROR_CHECK(ret);
+}
+
 /**@brief Function for starting advertising.
  */
 void advertising_start(bool erase_bonds)
@@ -185,6 +209,8 @@ void advertising_start(bool erase_bonds)
         // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
     } else {
         whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
+
+        switch_device_init();
 
         ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
         APP_ERROR_CHECK(ret);
@@ -310,109 +336,11 @@ void restart_advertising_no_whitelist()
     }
 }
 
-void restart_advertising_id(uint8_t id)
-{
-    ret_code_t ret;
-    //ble_gap_addr_t gap_addr;
-
-    if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
-        ble_adv_modes_config_t options;
-        memset(&options, 0, sizeof(options));
-        options.ble_adv_whitelist_enabled = true;
-        options.ble_adv_directed_high_duty_enabled = false;
-        options.ble_adv_directed_enabled = false;
-        options.ble_adv_fast_enabled = true;
-        options.ble_adv_fast_interval = APP_ADV_FAST_INTERVAL;
-        options.ble_adv_fast_timeout = APP_ADV_FAST_DURATION;
-        options.ble_adv_slow_enabled = true;
-        options.ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
-        options.ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
-        ble_advertising_modes_config_set(&m_advertising, &options);
-
-        ret = sd_ble_gap_disconnect(m_conn_handle,
-            BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-        if (ret != NRF_ERROR_INVALID_STATE) {
-            APP_ERROR_CHECK(ret);
-        }
-    }
-    sd_ble_gap_adv_stop(m_advertising.adv_handle);
-
-    memset(m_whitelist_peers, PM_PEER_ID_INVALID, sizeof(m_whitelist_peers));
-    m_whitelist_peer_cnt = (sizeof(m_whitelist_peers) / sizeof(pm_peer_id_t));
-
-    peer_list_get(m_whitelist_peers, &m_whitelist_peer_cnt);
-    if (id > m_whitelist_peer_cnt) {
-        return;
-    }
-    m_whitelist_peer_cnt = 1;
-    m_whitelist_peers[0] = m_whitelist_peers[id];
-
-    ret = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
-    APP_ERROR_CHECK(ret);
-
-    ret = pm_device_identities_list_set(m_whitelist_peers, m_whitelist_peer_cnt);
-    if (ret != NRF_ERROR_NOT_SUPPORTED) {
-        APP_ERROR_CHECK(ret);
-    }
-
-    ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-
-    APP_ERROR_CHECK(ret);
-}
-
-void switch_device_id(uint8_t id)
-{
-    ret_code_t ret;
-    ble_gap_addr_t gap_addr;
-    switch_id = id;
-
-    eeconfig_write_switch_id(id);
-
-    ret = pm_id_addr_get(&gap_addr);
-    APP_ERROR_CHECK(ret);
-
-    gap_addr.addr[3] = id; // switch status 1, 2, or 3
-
-    ret = pm_id_addr_set(&gap_addr);
-    APP_ERROR_CHECK(ret);
-
-    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
-        sd_ble_gap_adv_stop(m_advertising.adv_handle);
-        ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-    } else {
-        sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-    }
-}
-
-static void switch_device_init()
-{
-    switch_id = eeconfig_read_switch_id();
-    switch_device_id(switch_id);
-}
-
-/*
-static void whitelist_load(void)
-{
-    ret_code_t ret;
-
-    memset(m_whitelist_peers, PM_PEER_ID_INVALID, sizeof(m_whitelist_peers));
-    m_whitelist_peer_cnt = (sizeof(m_whitelist_peers) / sizeof(pm_peer_id_t));
-
-    peer_list_get(m_whitelist_peers, &m_whitelist_peer_cnt);
-
-    // Setup the device identies list.
-    // Some SoftDevices do not support this feature.
-    ret = pm_device_identities_list_set(m_whitelist_peers, m_whitelist_peer_cnt);
-    if (ret != NRF_ERROR_NOT_SUPPORTED) {
-        APP_ERROR_CHECK(ret);
-    }
-
-    ret = pm_whitelist_set(m_whitelist_peers, m_whitelist_peer_cnt);
-    APP_ERROR_CHECK(ret);
-} 
-*/
-
 #ifdef MACADDR_SEPRATOR
+/**@brief MAC地址转换为设备名后缀.
+ *
+ * 读取MAC地址，并将其转换后放置到设备名最后
+ */
 static void get_device_name(char* device_name, int offset)
 {
     const char lookup_table[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
@@ -651,6 +579,7 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 }
 
 #ifdef DYNAMIC_TX_POWER
+//动态发射功率
 static void ble_conn_handle_change(uint16_t conn_handle, bool on)
 {
     if (on) {
