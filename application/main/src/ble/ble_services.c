@@ -30,7 +30,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
 #include "nrf_bootloader_info.h"
-#include "nrf_fstorage.h"
 #include "nrf_power.h"
 #include "nrf_pwr_mgmt.h"
 #include "nrf_sdh.h"
