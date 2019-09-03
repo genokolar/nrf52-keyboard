@@ -93,7 +93,9 @@
 #include "keyboard/keyboard_matrix.h"
 #include "keyboard/passkey.h"
 #include "keyboard/usb_comm.h"
+#ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
+#endif
 
 #define DEAD_BEEF 0xDEADBEEF /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 
@@ -140,8 +142,10 @@ static void reset_prepare(void)
 {
     // 禁用键盘LED
     keyboard_led_deinit();
+#ifdef RGBLIGHT_ENABLE
     // 禁用RGB LED
     rgblight_disable_noeeprom();
+#endif
     ret_code_t err_code;
     err_code = app_timer_stop_all();
     APP_ERROR_CHECK(err_code);
@@ -330,7 +334,9 @@ int main(void)
     // Start execution.
     timers_start();
     advertising_start(erase_bonds);
-
+#ifdef RGBLIGHT_ENABLE
+    rgblight_init();
+#endif
     ble_user_event(USER_EVT_INITED);
 
     // Enter main loop.

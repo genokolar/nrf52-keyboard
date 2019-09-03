@@ -23,7 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "keyboard_led.h"
 #include "main.h"
 #include "nrf_delay.h"
-#include "rgblight.h"
 #include "status_led.h"
 #include "usb_comm.h"
 #include "user_command.h"
@@ -124,7 +123,6 @@ void custom_event_handler(enum user_ble_event arg)
     switch (arg) {
     case USER_EVT_POST_INIT:
         status_led_init();
-        rgblight_init();
         buttons_init();
         command_timer_init();
         break;
