@@ -130,6 +130,7 @@ bool command_extra(uint8_t code)
         restart_advertising_no_whitelist();
         break;
         //RGB灯控制
+#ifdef RGBLIGHT_ENABLE
     case KC_Z:
         rgblight_step();
         break;
@@ -154,6 +155,7 @@ bool command_extra(uint8_t code)
     case KC_F:
         rgblight_decrease_val();
         break;
+#endif
     case KC_B:
         //重启到DFU模式
         clear_keyboard();
