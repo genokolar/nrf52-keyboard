@@ -135,7 +135,7 @@ void eeconfig_update_rgblight(uint32_t val)
 
 void eeconfig_update_rgblight_default(void)
 {
-    rgblight_config.enable = 1;
+    rgblight_config.enable = 0;
     rgblight_config.mode = 1;
     rgblight_config.hue = 0;
     rgblight_config.sat = 255;

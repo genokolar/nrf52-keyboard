@@ -59,7 +59,7 @@
 #endif
 
 #ifndef RGBLIGHT_HUE_STEP
-#define RGBLIGHT_HUE_STEP 10
+#define RGBLIGHT_HUE_STEP 6
 #endif
 #ifndef RGBLIGHT_SAT_STEP
 #define RGBLIGHT_SAT_STEP 17
