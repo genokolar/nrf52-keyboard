@@ -159,6 +159,7 @@ bool command_extra(uint8_t code)
     case KC_B:
         //重启到DFU模式
         clear_keyboard();
+        rgblight_disable_noeeprom();
         app_timer_start(bootloader_run_timer, APP_TIMER_TICKS(1000), NULL);
         break;
     default:

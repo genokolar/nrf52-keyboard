@@ -37,7 +37,7 @@
  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
- /*
+/*
     Copyright (C) 2019 Jim Jiang <jim@lotlab.org>
 
     This program is free software: you can redistribute it and/or modify
@@ -143,8 +143,7 @@ static void reset_prepare(void)
     // 禁用键盘LED
     keyboard_led_deinit();
 #ifdef RGBLIGHT_ENABLE
-    // 禁用RGB LED
-    rgblight_disable_noeeprom();
+    rgblight_sleep_prepare();
 #endif
     ret_code_t err_code;
     err_code = app_timer_stop_all();

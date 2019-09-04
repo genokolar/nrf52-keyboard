@@ -39,7 +39,10 @@ static void eeconfig_set_default()
     config_buffer[5] = 0; //switch device id
     config_buffer[6] = 0; //backlight
     config_buffer[7] = 0; //no use
-    config_buffer[8] = 0; //ws2812
+    config_buffer[8] = 0; // ws2812 enable mode
+    config_buffer[9] = 0; //ws2812 hue
+    config_buffer[10] = 0; // ws2812 sat
+    config_buffer[11] = 0; //ws2812 val
 }
 
 /**

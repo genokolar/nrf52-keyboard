@@ -14,14 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "rgblight.h"
+#include "app_timer.h"
+#include "config.h"
 #include "eeconfig.h"
 #include "led_tables.h"
+#include "nrf_gpio.h"
 #include "progmem.h"
 #include "timer.h"
 #include "wait.h"
 #include <math.h>
-#include "config.h"
-#include "app_timer.h"
 
 #ifndef RGBLIGHT_LIMIT_VAL
 #define RGBLIGHT_LIMIT_VAL 255
@@ -533,6 +534,15 @@ void rgblight_set(void)
     }
 }
 #endif
+
+//休眠关机时调用关闭RGB
+void rgblight_sleep_prepare(void)
+{
+    // 禁用RGB LED
+    rgblight_disable_noeeprom();
+    wait_ms(50);
+    nrf_gpio_cfg_default(RGB_DI_PIN);
+}
 
 #ifdef RGBLIGHT_ANIMATIONS
 
