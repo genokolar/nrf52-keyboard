@@ -27,7 +27,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         LSFT,     Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,     FN4,  \
         LCTL,LGUI,LALT,          SPC,                     FN0, FN1, FN2, FN3),
     /* 1: qwerty */
-	    KEYMAP_ANSI(
+	KEYMAP_ANSI(
         ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC, \
         TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSLS, \
         CAPS,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,  \
@@ -41,7 +41,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         TRNS,     TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,     UP,   \
         TRNS,TRNS,TRNS,          TRNS,                    TRNS,LEFT,DOWN,RGHT),
 	  /* 3: system key */
-	  KEYMAP_ANSI(
+	KEYMAP_ANSI(
         TRNS,MYCM,MAIL,CALC,MSEL,TRNS,TRNS,TRNS,MPLY,MPRV,MNXT,MRWD,MFFD,FN6, \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,PGUP,PGDN,INS,  \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,HOME,END,      TRNS, \

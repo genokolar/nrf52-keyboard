@@ -23,7 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define RECORD_KEY 0x0514 /* A key for the first record. */
 
 __ALIGN(4)
-static uint8_t config_buffer[12] __attribute__((aligned(4))) = { EECONFIG_MAGIC_NUMBER >> 8, EECONFIG_MAGIC_NUMBER % 0x100, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+static uint8_t config_buffer[12] __attribute__((aligned(4))) = { EECONFIG_MAGIC_NUMBER >> 8, EECONFIG_MAGIC_NUMBER % 0x100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static bool fds_inited = false;
 
 static fds_record_t record = {0};

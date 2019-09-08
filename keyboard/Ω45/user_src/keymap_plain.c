@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "keymap_common.h"
 #include "user_fn.h"
 
-const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     /* 0: default */
     KEYMAP(
         TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   BSPC, \
@@ -44,7 +44,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,      TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
 };
-const action_t PROGMEM fn_actions[] = {
+const action_t fn_actions[] = {
     /* Poker Layout */
     [0] = ACTION_LAYER_TAP_KEY(1, KC_SPACE),
     [1] = ACTION_LAYER_TAP_KEY(2, KC_DELETE),
