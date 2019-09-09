@@ -29,6 +29,10 @@
 #include <stdint.h>
 #include "rgblight_types.h"
 
+#ifdef CONFIG_H_FILE
+    #include CONFIG_H_FILE
+#endif
+
 
 /* User Interface
  *

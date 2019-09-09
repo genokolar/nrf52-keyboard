@@ -16,6 +16,10 @@
 #ifndef RGBLIGHT_H
 #define RGBLIGHT_H
 
+#ifdef CONFIG_H_FILE
+    #include CONFIG_H_FILE
+#endif
+
 #ifdef RGBLIGHT_ANIMATIONS
 	#define RGBLIGHT_MODES 36
 #else
@@ -78,12 +82,12 @@
 
 extern LED_TYPE led[RGBLED_NUM];
 
-extern const uint8_t RGBLED_BREATHING_INTERVALS[4] PROGMEM;
-extern const uint8_t RGBLED_RAINBOW_MOOD_INTERVALS[3] PROGMEM;
-extern const uint8_t RGBLED_RAINBOW_SWIRL_INTERVALS[3] PROGMEM;
-extern const uint8_t RGBLED_SNAKE_INTERVALS[3] PROGMEM;
-extern const uint8_t RGBLED_KNIGHT_INTERVALS[3] PROGMEM;
-extern const uint16_t RGBLED_RGBTEST_INTERVALS[1] PROGMEM;
+extern const uint8_t RGBLED_BREATHING_INTERVALS[4] ;
+extern const uint8_t RGBLED_RAINBOW_MOOD_INTERVALS[3] ;
+extern const uint8_t RGBLED_RAINBOW_SWIRL_INTERVALS[3] ;
+extern const uint8_t RGBLED_SNAKE_INTERVALS[3] ;
+extern const uint8_t RGBLED_KNIGHT_INTERVALS[3] ;
+extern const uint16_t RGBLED_RGBTEST_INTERVALS[1] ;
 
 typedef union {
   uint32_t raw;

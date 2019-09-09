@@ -16,10 +16,6 @@ INC_FOLDERS += \
 	$(USER_SRC_DIR) \
 	$(APP_SRC_DIR)/ble
 
-ifeq (yes,$(strip $(RGBLIGHT_ENABLE)))
-include $(APP_PROJ_DIR)/ws2812.mk
-endif
-
 SRC_FILES += \
 	$(USER_SRC_DIR)/keymap_plain.c \
 	$(USER_SRC_DIR)/user_evt.c \

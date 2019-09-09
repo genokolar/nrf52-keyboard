@@ -39,25 +39,25 @@
 #define M_E 2.71828182845904523536
 
 __attribute__((weak))
-const uint8_t RGBLED_BREATHING_INTERVALS[] PROGMEM
+const uint8_t RGBLED_BREATHING_INTERVALS[]
     = { 30, 20, 10, 5 };
 __attribute__((weak))
-const uint8_t RGBLED_RAINBOW_MOOD_INTERVALS[] PROGMEM
+const uint8_t RGBLED_RAINBOW_MOOD_INTERVALS[] 
     = { 120, 60, 30 };
 __attribute__((weak))
-const uint8_t RGBLED_RAINBOW_SWIRL_INTERVALS[] PROGMEM
+const uint8_t RGBLED_RAINBOW_SWIRL_INTERVALS[] 
     = { 100, 50, 20 };
 __attribute__((weak))
-const uint8_t RGBLED_SNAKE_INTERVALS[] PROGMEM
+const uint8_t RGBLED_SNAKE_INTERVALS[] 
     = { 100, 50, 20 };
 __attribute__((weak))
-const uint8_t RGBLED_KNIGHT_INTERVALS[] PROGMEM
+const uint8_t RGBLED_KNIGHT_INTERVALS[] 
     = { 127, 63, 31 };
 __attribute__((weak))
-const uint16_t RGBLED_GRADIENT_RANGES[] PROGMEM
+const uint16_t RGBLED_GRADIENT_RANGES[] 
     = { 360, 240, 180, 120, 90 };
 __attribute__((weak))
-const uint16_t RGBLED_RGBTEST_INTERVALS[] PROGMEM
+const uint16_t RGBLED_RGBTEST_INTERVALS[] 
     = { 1024 };
 
 rgblight_config_t rgblight_config;
