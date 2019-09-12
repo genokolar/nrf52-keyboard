@@ -29,6 +29,17 @@ $(OUTPUT_DIRECTORY)/nrf52_kbd.out: \
 	LINKER_SCRIPT  := $(APP_PROJ_DIR)/$(LD_NAME)
 
 # Source files common to all targets
+ifeq (yes,$(strip $(RGBLIGHT_ENABLE)))
+INC_FOLDERS += \
+	$(APP_SRC_DIR)/drivers/ws2812
+
+SRC_FILES += \
+	$(APP_SRC_DIR)/drivers/ws2812/ws2812.c \
+	$(APP_SRC_DIR)/drivers/ws2812/rgblight.c \
+	$(APP_SRC_DIR)/drivers/ws2812/led_tables.c \
+	$(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_pwm.c
+endif
+
 SRC_FILES += \
 	$(SDK_ROOT)/components/libraries/util/app_error.c \
 	$(SDK_ROOT)/components/libraries/util/app_error_handler_gcc.c \
@@ -203,7 +214,8 @@ CFLAGS += -Wall -Werror
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin -fshort-enums
 ifdef CONFIG_H
-    CFLAGS += -include $(CONFIG_H)
+	 CFLAGS += -DCONFIG_H_FILE=\"$(CONFIG_H)\"
+#    CFLAGS += -include $(CONFIG_H)
 endif
 
 # C++ flags common to all targets
@@ -221,7 +233,7 @@ ASMFLAGS += -DNRF_SD_BLE_API_VERSION=6
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DSWI_DISABLE0
 ifdef CONFIG_H
-    ASFLAGS += -include $(CONFIG_H)
+#    ASFLAGS += -include $(CONFIG_H)
 endif
 
 ifeq ($(SOFTDEVICE), S112)

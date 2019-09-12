@@ -31,6 +31,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern keymap_config_t keymap_config;
 #endif
 
+#ifdef CONFIG_H_FILE
+    #include CONFIG_H_FILE
+#endif
+
 bool keyboard_no_gui = false;
 
 static action_t keycode_to_action(uint8_t keycode);

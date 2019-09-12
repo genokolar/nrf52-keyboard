@@ -17,7 +17,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 #include "action_code.h"
 #include "actionmap.h"
-
+#ifdef CONFIG_H_FILE
+    #include CONFIG_H_FILE
+#endif
 
 /* Keymapping with 16bit action codes */
 extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
