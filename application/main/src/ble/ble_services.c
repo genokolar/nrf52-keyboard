@@ -116,26 +116,6 @@ void ble_disconnect()
     }
 }
 
-/**@brief Clear bond information from persistent storage.
- */
-void delete_bonds(void)
-{
-    ret_code_t err_code;
-
-    err_code = pm_peers_delete();
-    APP_ERROR_CHECK(err_code);
-}
-
-void delete_bond_id(uint8_t id)
-{
-    ret_code_t err_code;
-
-    ble_disconnect();
-
-    err_code = pm_peer_delete(id);
-    APP_ERROR_CHECK(err_code);
-}
-
 static void buttonless_dfu_sdh_state_observer(nrf_sdh_state_evt_t state, void* p_context)
 {
     if (state == NRF_SDH_EVT_STATE_DISABLED) {
@@ -160,6 +140,9 @@ void switch_device_id(uint8_t id)
 {
     ret_code_t ret;
     ble_gap_addr_t gap_addr;
+    if (id == switch_id) {
+        return; //如果重复切换，则直接退出，不做任何操作
+    }
     switch_id = id;
 
     eeconfig_write_switch_id(id);
@@ -199,6 +182,30 @@ static void switch_device_init()
     APP_ERROR_CHECK(ret);
 }
 
+/**@brief Clear bond information from persistent storage.
+ */
+void delete_bonds(void)
+{
+    ret_code_t err_code;
+
+    ble_disconnect();
+
+    err_code = pm_peers_delete();
+    APP_ERROR_CHECK(err_code);
+
+    switch_device_id(0); //清空所有绑定时，自动回到首个设备
+}
+
+void delete_bond_id(uint8_t id)
+{
+    ret_code_t err_code;
+
+    ble_disconnect();
+
+    err_code = pm_peer_delete(id);
+    APP_ERROR_CHECK(err_code);
+}
+
 /**@brief Function for starting advertising.
  */
 void advertising_start(bool erase_bonds)
@@ -208,8 +215,6 @@ void advertising_start(bool erase_bonds)
         // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
     } else {
         whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
-
-        switch_device_init();
 
         ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
         APP_ERROR_CHECK(ret);
