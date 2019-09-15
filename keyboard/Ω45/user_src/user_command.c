@@ -36,9 +36,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 APP_TIMER_DEF(bootloader_run_timer);
+APP_TIMER_DEF(sleep_run_timer);
 APP_TIMER_DEF(bonds_run_timer);
-APP_TIMER_DEF(devices_run_timer);
 #ifdef Multi_DEVICE_SWITCH
+APP_TIMER_DEF(devices_run_timer);
 uint8_t devices_id = 0;
 #endif
 
@@ -52,6 +53,11 @@ static void bootloader_handler(void* p_context)
     bootloader_jump();
 }
 
+static void sleep_handler(void* p_context)
+{
+    sleep(SLEEP_MANUALLY);
+}
+
 static void bonds_handler(void* p_context)
 {
 #ifdef Multi_DEVICE_SWITCH
@@ -62,11 +68,12 @@ static void bonds_handler(void* p_context)
 #endif
 }
 
+#ifdef Multi_DEVICE_SWITCH
 static void devices_handler(void* p_context)
 {
     switch_device_id(devices_id);
 }
-
+#endif
 /**
  * @brief 初始化运行计时器
  * 
@@ -74,8 +81,11 @@ static void devices_handler(void* p_context)
 void command_timer_init(void)
 {
     app_timer_create(&bootloader_run_timer, APP_TIMER_MODE_SINGLE_SHOT, bootloader_handler);
+    app_timer_create(&sleep_run_timer, APP_TIMER_MODE_SINGLE_SHOT, sleep_handler);
     app_timer_create(&bonds_run_timer, APP_TIMER_MODE_SINGLE_SHOT, bonds_handler);
+#ifdef Multi_DEVICE_SWITCH
     app_timer_create(&devices_run_timer, APP_TIMER_MODE_SINGLE_SHOT, devices_handler);
+#endif
 }
 
 bool command_extra(uint8_t code)
@@ -161,6 +171,13 @@ bool command_extra(uint8_t code)
         clear_keyboard();
         rgblight_disable_noeeprom();
         app_timer_start(bootloader_run_timer, APP_TIMER_TICKS(1000), NULL);
+        break;
+    case KC_P:
+        //休眠
+        clear_keyboard();
+        rgblight_disable_noeeprom();
+        matrix_uninit();
+        app_timer_start(sleep_run_timer, APP_TIMER_TICKS(1000), NULL);
         break;
     default:
         return false;
