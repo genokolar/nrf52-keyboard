@@ -99,7 +99,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGBLIGHT_ENABLE
 #define RGB_DI_PIN 8
 #define RGBLED_NUM 8
-#define PROGMEM // arm-gcc does not interpret PROGMEM
 #define RGBLIGHT_ANIMATIONS
 
 // 启用 LED 状态灯

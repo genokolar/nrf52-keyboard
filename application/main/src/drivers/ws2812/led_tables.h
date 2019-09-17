@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 
-extern const uint8_t CIE1931_CURVE[] PROGMEM;
+extern const uint8_t CIE1931_CURVE[];
 
 
 #ifdef USE_LED_BREATHING_TABLE
-extern const uint8_t LED_BREATHING_TABLE[] PROGMEM;
+extern const uint8_t LED_BREATHING_TABLE[];
 #endif
 
 #endif
