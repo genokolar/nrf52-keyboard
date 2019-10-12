@@ -170,3 +170,4 @@ void battery_service_init(void)
     adc_init();
     battery_timer_init();
     bas_init();
+}
