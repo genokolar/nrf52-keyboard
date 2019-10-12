@@ -29,7 +29,7 @@ const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	KEYMAP(
         ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   BSPC, \
         TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS, FN7,  \
-        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,     TRNS, \
+        TRNS,TRNS,TRNS,TRNS,TRNS,FN8, TRNS,VOLD,VOLU,MUTE,     TRNS, \
         TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
     /* 2: Poker Fn */
     KEYMAP(
@@ -48,5 +48,6 @@ const action_t PROGMEM fn_actions[] = {
     [5] = ACTION_FUNCTION(AF_POWER_OFF),
     [6] = ACTION_FUNCTION(AF_DELETE_BOND),
     [7] = ACTION_FUNCTION(AF_LED_DISPLAY),
+    [8] =ACTION_FUNCTION(BT_BAT),
 };
 
