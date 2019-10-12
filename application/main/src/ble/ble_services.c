@@ -192,8 +192,11 @@ void delete_bonds(void)
 
     err_code = pm_peers_delete();
     APP_ERROR_CHECK(err_code);
-
-    switch_device_id(0); //清空所有绑定时，自动回到首个设备
+    
+    //清空所有绑定后，自动回到首个设备
+    switch_id = 0;
+    eeconfig_write_switch_id(switch_id);
+    switch_device_id(switch_id);
 }
 
 void delete_bond_id(uint8_t id)
