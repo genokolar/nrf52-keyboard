@@ -519,21 +519,27 @@ static void on_adv_evt(ble_adv_evt_t ble_adv_evt)
 
     switch (ble_adv_evt) {
     case BLE_ADV_EVT_DIRECTED_HIGH_DUTY:
+        event_handler(USER_BLE_ADV);
         break;
 
     case BLE_ADV_EVT_DIRECTED:
+        event_handler(USER_BLE_ADV);
         break;
 
     case BLE_ADV_EVT_FAST:
+        event_handler(USER_BLE_ADV);
         break;
 
     case BLE_ADV_EVT_SLOW:
+        event_handler(USER_BLE_ADV);
         break;
 
     case BLE_ADV_EVT_FAST_WHITELIST:
+        event_handler(USER_BLE_ADV);
         break;
 
     case BLE_ADV_EVT_SLOW_WHITELIST:
+        event_handler(USER_BLE_ADV);
         break;
 
     case BLE_ADV_EVT_IDLE:

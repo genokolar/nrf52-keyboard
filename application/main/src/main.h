@@ -24,6 +24,7 @@ enum SLEEP_REASON {
 enum user_ble_event {
     USER_BLE_IDLE, // 蓝牙进入空闲状态
     USER_BLE_DISCONNECT, // 蓝牙被断开
+    USER_BLE_ADV, // 蓝牙广播中
     USER_BLE_GATTS_TX_COMPLETE, // GATTs发送完毕
     USER_BLE_CONNECTED, // 蓝牙已连接
     USER_BLE_PASSKEY_REQUIRE, // 需要 Passkey
