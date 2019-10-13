@@ -32,6 +32,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define SAMPLES_IN_BUFFER 5
 
 static nrf_saadc_value_t m_buffer_pool[2][SAMPLES_IN_BUFFER];
+uint8_t level;
 
 APP_TIMER_DEF(m_battery_timer_id); /**< Battery timer. */
 BLE_BAS_DEF(m_bas); /**< Structure used to identify the battery service. */
@@ -110,7 +111,7 @@ static void adc_result_handler(nrf_saadc_value_t value)
     // V_in   = V_bat * 2.2 / 12.2
 
     uint32_t vott = value * 1200 * 122 / 1024 / 22;
-    uint8_t level;
+    //uint8_t level;
 
     if (vott >= 4200)
         level = 100;
