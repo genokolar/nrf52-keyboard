@@ -24,6 +24,8 @@
 #include "wait.h"
 #include <math.h>
 
+#include <ble_keyboard.h>
+
 #ifndef RGBLIGHT_LIMIT_VAL
 #define RGBLIGHT_LIMIT_VAL 255
 #endif
@@ -299,14 +301,27 @@ void rgblight_toggle_noeeprom(void)
 
 void rgblight_enable(void)
 {
+#ifdef RGB_PWR_PIN
+    nrf_gpio_pin_write(RGB_PWR_PIN,1);
+#endif
+#ifdef RGB_PWR_PIN_REVERSE
+    nrf_gpio_pin_write(RGB_PWR_PIN_REVERSE,0);
+#endif
     rgblight_config.enable = 1;
     // No need to update EEPROM here. rgblight_mode() will do that, actually
     //eeconfig_update_rgblight(rgblight_config.raw);
     rgblight_mode(rgblight_config.mode);
+
 }
 
 void rgblight_enable_noeeprom(void)
 {
+#ifdef RGB_PWR_PIN
+    nrf_gpio_pin_write(RGB_PWR_PIN,1);
+#endif
+#ifdef RGB_PWR_PIN_REVERSE
+    nrf_gpio_pin_write(RGB_PWR_PIN_REVERSE,0);
+#endif
     rgblight_config.enable = 1;
     rgblight_mode_noeeprom(rgblight_config.mode);
 }
@@ -319,6 +334,12 @@ void rgblight_disable(void)
     rgblight_timer_disable();
 #endif
     rgblight_set();
+#ifdef RGB_PWR_PIN
+        nrf_gpio_pin_write(RGB_PWR_PIN,0);
+#endif
+#ifdef RGB_PWR_PIN_REVERSE
+        nrf_gpio_pin_write(RGB_PWR_PIN_REVERSE,1);
+#endif
 }
 
 void rgblight_disable_noeeprom(void)
@@ -328,6 +349,12 @@ void rgblight_disable_noeeprom(void)
     rgblight_timer_disable();
 #endif
     rgblight_set();
+#ifdef RGB_PWR_PIN
+        nrf_gpio_pin_write(RGB_PWR_PIN,0);
+#endif
+#ifdef RGB_PWR_PIN_REVERSE
+        nrf_gpio_pin_write(RGB_PWR_PIN_REVERSE,1);
+#endif
 }
 
 // Deals with the messy details of incrementing an integer
