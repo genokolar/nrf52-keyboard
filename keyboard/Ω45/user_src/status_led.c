@@ -17,9 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "status_led.h"
 #include "app_timer.h"
 #include "config.h"
-#include "eeconfig.h"
 #include "keyboard_led.h"
-#include "led_softblink.h"
 #include "nrf.h"
 #include "nrf_gpio.h"
 #include <stdint.h>
@@ -27,44 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 static void status_led_off_timer_init();
 
 uint8_t saved_status_led_val;
-/**
- * @brief 蓝牙广播状态开启闪烁灯
- * 
- */
-void ble_blink_led_on()
-{
-    ret_code_t err_code;
-    uint32_t LEDS_MASK;
-    uint8_t switch_id = eeconfig_read_switch_id();
-    switch (switch_id) {
-    case 0:
-        LEDS_MASK = (1u << ((LED_BLE) & (~32)));
-        break;
-    case 1:
-        LEDS_MASK = (1u << ((LED_USB) & (~32)));
-        break;
-    case 2:
-        LEDS_MASK = (1u << ((LED_CHARGING) & (~32)));
-        break;
-    default:
-        LEDS_MASK = (1u << ((LED_BLE) & (~32)));
-        break;
-    }
-    const led_sb_init_params_t led_sb_init_param = LED_SB_INIT_DEFAULT_PARAMS(LEDS_MASK);
 
-    err_code = led_softblink_init(&led_sb_init_param);
-    APP_ERROR_CHECK(err_code);
-    err_code = led_softblink_start(LEDS_MASK);
-    APP_ERROR_CHECK(err_code);
-}
-/**
- * @brief 关闭闪烁灯
- * 
- */
-void ble_blink_led_off()
-{
-    led_softblink_stop();
-}
 /**
  * @brief 初始化LED
  * 

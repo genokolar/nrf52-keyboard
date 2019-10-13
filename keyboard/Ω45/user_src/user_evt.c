@@ -154,7 +154,6 @@ void custom_event_handler(enum user_ble_event arg)
         break;
     case USER_USB_CONNECTED:
         status = kbd_usb;
-        ble_blink_led_off();
         led_status_change();
         break;
     case USER_BAT_CHARGING:
@@ -171,16 +170,7 @@ void custom_event_handler(enum user_ble_event arg)
         break;
     case USER_BLE_CONNECTED:
         ble_connected = true;
-        ble_blink_led_off();
         led_status_change();
-        break;
-    case USER_BLE_IDLE:
-        ble_connected = false;
-        ble_blink_led_off();
-        led_status_change();
-        break;
-    case USER_BLE_ADV:
-        ble_blink_led_on();
         break;
     case USER_EVT_SLEEP_AUTO:
     case USER_EVT_SLEEP_MANUAL:

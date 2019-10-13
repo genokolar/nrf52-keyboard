@@ -65,7 +65,6 @@ SRC_FILES += \
 	$(SDK_ROOT)/components/libraries/experimental_section_vars/nrf_section_iter.c \
 	$(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
 	$(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_svci.c \
-	$(SDK_ROOT)/components/libraries/led_softblink/led_softblink.c \
 	$(SDK_ROOT)/components/libraries/low_power_pwm/low_power_pwm.c \
 	$(SDK_ROOT)/components/libraries/uart/app_uart_fifo.c \
 	$(SDK_ROOT)/components/libraries/fifo/app_fifo.c \
@@ -143,7 +142,6 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/libraries/bootloader/ble_dfu \
 	$(SDK_ROOT)/components/libraries/low_power_pwm \
 	$(SDK_ROOT)/components/softdevice/common \
-	$(SDK_ROOT)/components/libraries/led_softblink \
 	$(SDK_ROOT)/components/libraries/low_power_pwm \
 	$(SDK_ROOT)/components/ble/ble_services/ble_dfu \
 	$(SDK_ROOT)/external/fprintf \
