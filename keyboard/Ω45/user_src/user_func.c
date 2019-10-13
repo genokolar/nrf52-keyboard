@@ -51,8 +51,8 @@ void matrix_uninit(void)
 void systemoff(void)
 {
     app_timer_stop_all();
-    ble_user_event(USER_EVT_SLEEP_AUTO);
     keyboard_led_deinit();
+    ble_user_event(USER_EVT_SLEEP_AUTO);
 #ifdef RGBLIGHT_ENABLE
     rgblight_sleep_prepare();
 #endif
