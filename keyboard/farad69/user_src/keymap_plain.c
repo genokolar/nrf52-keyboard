@@ -34,5 +34,6 @@ const action_t fn_actions[] = {
     [2] = ACTION_LAYER_TAP_KEY(3, KC_DOWN),
     [3] = ACTION_MODS_TAP_KEY(MOD_RCTL, KC_RIGHT),
     [4] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_UP),
+    [5] = ACTION_FUNCTION(BT_BAT),
 };
 
