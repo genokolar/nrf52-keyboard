@@ -37,6 +37,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "nrf_sdh_soc.h"
 #include "peer_manager_handler.h"
 #include "eeconfig.h"
+#include "status_led.h"
 
 #include "ble_config.h"
 
@@ -132,6 +133,48 @@ NRF_SDH_STATE_OBSERVER(m_buttonless_dfu_state_obs, 0) = {
     .handler = buttonless_dfu_sdh_state_observer,
 };
 
+#ifdef MACADDR_SEPRATOR
+/**@brief MAC地址转换为设备名后缀.
+ *
+ * 读取MAC地址，并将其转换后放置到设备名最后
+ */
+static void get_device_name(char* device_name, int offset)
+{
+    const char lookup_table[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+    strcpy(device_name, DEVICE_NAME);
+    device_name[offset++] = MACADDR_SEPRATOR;
+
+    ble_gap_addr_t ble_addr;
+    sd_ble_gap_addr_get(&ble_addr);
+
+    for (uint8_t i = 0; i < 3; i++) {
+        uint8_t addr = ble_addr.addr[3 + i];
+        device_name[offset++] = lookup_table[addr / 16];
+        device_name[offset++] = lookup_table[addr % 16];
+    }
+    device_name[offset] = 0x00;
+}
+#endif
+
+static void set_device_name(void) {
+    ret_code_t err_code;
+    ble_gap_conn_sec_mode_t sec_mode;
+
+    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
+
+#ifdef MACADDR_SEPRATOR
+    int orig_len = strlen(DEVICE_NAME);
+    int name_len = orig_len + 8;
+    char device_name[name_len];
+    get_device_name(device_name, orig_len);
+
+    err_code = sd_ble_gap_device_name_set(&sec_mode, (const uint8_t*)device_name, strlen(device_name));
+#else
+    err_code = sd_ble_gap_device_name_set(&sec_mode, (const uint8_t*)DEVICE_NAME, strlen(DEVICE_NAME));
+#endif
+    APP_ERROR_CHECK(err_code);
+}
 /**@brief 切换连接设备.
  *
  * @param[in] id  要切换的设备的ID号
@@ -147,18 +190,21 @@ void switch_device_id(uint8_t id)
 
     eeconfig_write_switch_id(id);
 
-    ret = pm_id_addr_get(&gap_addr);
+    ret = sd_ble_gap_addr_get(&gap_addr);
     APP_ERROR_CHECK(ret);
 
     gap_addr.addr[3] = id; // switch status 1, 2, or 3
 
-    ret = pm_id_addr_set(&gap_addr);
+    ret = sd_ble_gap_addr_set(&gap_addr);
     APP_ERROR_CHECK(ret);
 
     if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
         sd_ble_gap_adv_stop(m_advertising.adv_handle);
+        set_device_name();
         ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
+        //sd_ble_gap_adv_start(m_advertising.adv_handle, BLE_CONN_CFG_TAG_DEFAULT);
     } else {
+        status_led_display();
         sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
     }
 }
@@ -252,6 +298,7 @@ static void advertising_config_get(ble_adv_modes_config_t* p_config)
     p_config->ble_adv_slow_enabled = true;
     p_config->ble_adv_slow_interval = APP_ADV_SLOW_INTERVAL;
     p_config->ble_adv_slow_timeout = APP_ADV_SLOW_DURATION;
+    p_config->ble_adv_on_disconnect_disabled = false;
 }
 
 /**@brief Function for handling dfu events from the Buttonless Secure DFU service
@@ -343,29 +390,6 @@ void restart_advertising_no_whitelist()
     }
 }
 
-#ifdef MACADDR_SEPRATOR
-/**@brief MAC地址转换为设备名后缀.
- *
- * 读取MAC地址，并将其转换后放置到设备名最后
- */
-static void get_device_name(char* device_name, int offset)
-{
-    const char lookup_table[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
-
-    strcpy(device_name, DEVICE_NAME);
-    device_name[offset++] = MACADDR_SEPRATOR;
-
-    ble_gap_addr_t ble_addr;
-    sd_ble_gap_addr_get(&ble_addr);
-
-    for (uint8_t i = 0; i < 3; i++) {
-        uint8_t addr = ble_addr.addr[3 + i];
-        device_name[offset++] = lookup_table[addr / 16];
-        device_name[offset++] = lookup_table[addr % 16];
-    }
-    device_name[offset] = 0x00;
-}
-#endif
 
 /**@brief Function for the GAP initialization.
  *
@@ -376,23 +400,8 @@ static void gap_params_init(void)
 {
     ret_code_t err_code;
     ble_gap_conn_params_t gap_conn_params;
-    ble_gap_conn_sec_mode_t sec_mode;
 
-    BLE_GAP_CONN_SEC_MODE_SET_OPEN(&sec_mode);
-#ifdef MACADDR_SEPRATOR
-    int orig_len = strlen(DEVICE_NAME);
-    int name_len = orig_len + 8;
-    char device_name[name_len];
-    get_device_name(device_name, orig_len);
-
-    err_code = sd_ble_gap_device_name_set(&sec_mode,
-        (const uint8_t*)device_name,
-        strlen(device_name));
-#else
-    err_code = sd_ble_gap_device_name_set(&sec_mode, (const uint8_t*)DEVICE_NAME, strlen(DEVICE_NAME));
-#endif
-
-    APP_ERROR_CHECK(err_code);
+    set_device_name();
 
     err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_HID_KEYBOARD);
     APP_ERROR_CHECK(err_code);
