@@ -23,7 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "keyboard_matrix.h"
 #include "nrf_gpio.h"
 #include "nrf_pwr_mgmt.h"
+#ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
+#endif
 #include "status_led.h"
 #include "usb_comm.h"
 #include <stdint.h>
@@ -51,8 +53,8 @@ void matrix_uninit(void)
 void systemoff(void)
 {
     app_timer_stop_all();
-    ble_user_event(USER_EVT_SLEEP_AUTO);
     keyboard_led_deinit();
+    ble_user_event(USER_EVT_SLEEP_AUTO);
 #ifdef RGBLIGHT_ENABLE
     rgblight_sleep_prepare();
 #endif

@@ -100,6 +100,16 @@ void status_led_off(void)
 }
 
 /**
+ * @brief 系统状态LED灯全开
+ * 
+ *  用于关机时闪烁一次
+ */
+void status_led_all_on(void)
+{
+    status_led_set_internal(0x07);
+}
+
+/**
  * @brief 设置系统状态LED灯的状态值
  * 
  * @param bit 位置

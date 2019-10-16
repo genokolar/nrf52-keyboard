@@ -26,7 +26,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode.h"
 #include "keymap.h"
 #include "main.h"
+#ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
+#endif
 #include "status_led.h"
 #include "usb_comm.h"
 #include "user_func.h"
@@ -169,13 +171,17 @@ bool command_extra(uint8_t code)
     case KC_B:
         //重启到DFU模式
         clear_keyboard();
+#ifdef RGBLIGHT_ENABLE
         rgblight_disable_noeeprom();
+#endif
         app_timer_start(bootloader_run_timer, APP_TIMER_TICKS(1000), NULL);
         break;
     case KC_P:
         //休眠
         clear_keyboard();
+#ifdef RGBLIGHT_ENABLE
         rgblight_disable_noeeprom();
+#endif
         matrix_uninit();
         app_timer_start(sleep_run_timer, APP_TIMER_TICKS(1000), NULL);
         break;

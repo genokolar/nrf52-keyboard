@@ -34,6 +34,12 @@ void status_led_set();
  */
 void status_led_on(void);
 /**
+ * @brief 系统状态LED灯全开
+ * 
+ *  用于关机时闪烁一次
+ */
+void status_led_all_on(void);
+/**
  * @brief 熄灭系统状态LED灯
  * 
  */

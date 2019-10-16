@@ -22,9 +22,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "status_led.h"
 #include "usb_comm.h"
 #include "user_func.h"
+#include "ble_bas_service.h"
 
 #define MODS_SHIFT_MASK (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT))
 #define MODS_RSHIFT_MASK (MOD_BIT(KC_RSHIFT))
+
+//
+uint8_t level;
+static uint8_t bat_m;
+static uint8_t keycode_num[10]={0x27,0x1E,0x1F,0x20,0x21,0x22,0x23,0x24,0x25,0x26};//0x27=KC_0,0x1E=KC_1..0x26=KC_9
+
+void type_num(uint8_t num)
+{
+	type_code(keycode_num[num]);
+}
 
 void action_function(keyrecord_t* record, uint8_t id, uint8_t opt)
 {
@@ -86,6 +97,20 @@ void action_function(keyrecord_t* record, uint8_t id, uint8_t opt)
         } else {
             unregister_code(tricky_slsh_registered);
             send_keyboard_report();
+        }
+        break;
+    case BT_BAT:
+        if (record->event.pressed) {
+            if (level==100) {
+              type_code(KC_1);
+              type_code(KC_0);
+              type_code(KC_0);
+            }else{
+              bat_m=level/10;
+              type_num(bat_m);
+              bat_m=level-bat_m*10; // bat_m=level%10; which one is faster?
+              type_num(bat_m);
+            }
         }
         break;
     default:

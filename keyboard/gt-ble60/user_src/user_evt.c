@@ -125,6 +125,7 @@ void custom_event_handler(enum user_ble_event arg)
         status_led_init();
         buttons_init();
         command_timer_init();
+        status_led_display();
         break;
     case USER_LED_ON:
         status_led_on();
@@ -174,7 +175,7 @@ void custom_event_handler(enum user_ble_event arg)
     case USER_EVT_SLEEP_AUTO:
     case USER_EVT_SLEEP_MANUAL:
         matrix_uninit(); // 释放键盘阵列针脚
-        status_led_on();
+        status_led_all_on();
         nrf_delay_ms(200);
         break;
     default:
