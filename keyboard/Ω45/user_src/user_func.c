@@ -23,7 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "keyboard_matrix.h"
 #include "nrf_gpio.h"
 #include "nrf_pwr_mgmt.h"
+#ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
+#endif
 #include "status_led.h"
 #include "usb_comm.h"
 #include <stdint.h>
