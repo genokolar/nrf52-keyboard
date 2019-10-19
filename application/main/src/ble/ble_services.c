@@ -21,12 +21,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "app_timer.h"
 #include "ble.h"
 #include "ble_advdata.h"
-#include "ble_advertising.h"
 #include "ble_conn_params.h"
 #include "ble_conn_state.h"
 #include "ble_dfu.h"
 #include "ble_dis.h"
 #include "ble_srv_common.h"
+#include "eeconfig.h"
 #include "nrf_ble_gatt.h"
 #include "nrf_ble_qwr.h"
 #include "nrf_bootloader_info.h"
@@ -36,8 +36,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "nrf_sdh_ble.h"
 #include "nrf_sdh_soc.h"
 #include "peer_manager_handler.h"
-#include "eeconfig.h"
-#include "status_led.h"
 
 #include "ble_config.h"
 
@@ -105,7 +103,7 @@ static void identities_set(pm_peer_id_list_skip_t skip)
     APP_ERROR_CHECK(err_code);
 }
 
-void ble_disconnect()
+static void ble_disconnect()
 {
     sd_ble_gap_adv_stop(m_advertising.adv_handle);
     if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
@@ -175,16 +173,59 @@ static void set_device_name(void) {
 #endif
     APP_ERROR_CHECK(err_code);
 }
+/**@brief 清空所有绑定数据.
+ */
+void delete_bonds(void)
+{
+    ret_code_t err_code;
+
+    ble_disconnect();
+
+    err_code = pm_peers_delete();
+    APP_ERROR_CHECK(err_code);
+
+    //清空所有绑定后，自动回到首个设备
+    switch_id = 0;
+    eeconfig_write_switch_id(switch_id);
+    switch_device_select(switch_id);
+}
+
+/**@brief 删除当前设备绑定数据.
+ *
+ * 查找并删除与当前gap addr绑定的绑定数据
+ */
+static void peer_list_find_and_delete_bond(void)
+{
+    pm_peer_id_t peer_id;
+
+    peer_id = pm_next_peer_id_get(PM_PEER_ID_INVALID);
+
+    while (peer_id != PM_PEER_ID_INVALID) {
+        uint16_t length = 8;
+        uint8_t addr[8];
+
+        if (pm_peer_data_app_data_load(peer_id, addr, &length) == NRF_SUCCESS) {
+            if (addr[3] == switch_id) {
+                pm_peer_delete(peer_id);
+            }
+        }
+
+        peer_id = pm_next_peer_id_get(peer_id);
+    }
+}
+
 /**@brief 切换连接设备.
  *
  * @param[in] id  要切换的设备的ID号
  */
-void switch_device_id(uint8_t id)
+void switch_device_select(uint8_t id)
 {
     ret_code_t ret;
     ble_gap_addr_t gap_addr;
     if (id == switch_id) {
         return; //如果重复切换，则直接退出，不做任何操作
+    } else {
+        ble_disconnect();
     }
     switch_id = id;
 
@@ -193,20 +234,21 @@ void switch_device_id(uint8_t id)
     ret = sd_ble_gap_addr_get(&gap_addr);
     APP_ERROR_CHECK(ret);
 
-    gap_addr.addr[3] = id; // switch status 1, 2, or 3
+    gap_addr.addr[3] = id;
 
     ret = sd_ble_gap_addr_set(&gap_addr);
     APP_ERROR_CHECK(ret);
-
-    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
-        sd_ble_gap_adv_stop(m_advertising.adv_handle);
-        set_device_name();
-        ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
-        //sd_ble_gap_adv_start(m_advertising.adv_handle, BLE_CONN_CFG_TAG_DEFAULT);
-    } else {
-        status_led_display();
-        sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-    }
+}
+/**@brief 重新绑定当前设备.
+ *
+ * @param[in] id  要绑定设备的ID号
+ */
+void switch_device_reset()
+{
+    peer_list_find_and_delete_bond();
+    uint8_t reset_id = switch_id;
+    switch_id = 10; //将switch_id设置为无效ID
+    switch_device_select(reset_id);
 }
 /**@brief 切换连接设备初始化.
  *
@@ -219,43 +261,40 @@ static void switch_device_init()
     ble_gap_addr_t gap_addr;
     switch_id = eeconfig_read_switch_id();
 
-    ret = pm_id_addr_get(&gap_addr);
+    ret = sd_ble_gap_addr_get(&gap_addr);
     APP_ERROR_CHECK(ret);
 
     gap_addr.addr[3] = switch_id;
 
-    ret = pm_id_addr_set(&gap_addr);
+    ret = sd_ble_gap_addr_set(&gap_addr);
     APP_ERROR_CHECK(ret);
 }
-
-/**@brief Clear bond information from persistent storage.
+/**@brief 更新切换设备数据.
+ *
+ * 获取当前gap addr并更新PM数据
  */
-void delete_bonds(void)
+static void switch_device_update(pm_peer_id_t peer_id)
 {
-    ret_code_t err_code;
+    uint32_t err_code;
+    ble_gap_addr_t gap_addr;
+    uint16_t length = 8;
+    uint8_t addr[8];
 
-    ble_disconnect();
-
-    err_code = pm_peers_delete();
+    err_code = pm_id_addr_get(&gap_addr);
     APP_ERROR_CHECK(err_code);
-    
-    //清空所有绑定后，自动回到首个设备
-    switch_id = 0;
-    eeconfig_write_switch_id(switch_id);
-    switch_device_id(switch_id);
-}
 
-void delete_bond_id(uint8_t id)
-{
-    ret_code_t err_code;
+    for (uint8_t i = 0; i < BLE_GAP_ADDR_LEN; i++)
+        addr[i] = gap_addr.addr[i];
 
-    ble_disconnect();
+    addr[3] =switch_id;
 
-    err_code = pm_peer_delete(id);
+    err_code = pm_peer_data_app_data_store(m_peer_id, addr, length, NULL);
     APP_ERROR_CHECK(err_code);
 }
 
-/**@brief Function for starting advertising.
+/**@brief 开启蓝牙广播.
+ * 
+ * @param[in] erase_bonds  是否清空所有绑定数据
  */
 void advertising_start(bool erase_bonds)
 {
@@ -264,9 +303,27 @@ void advertising_start(bool erase_bonds)
         // Advertising is started by PM_EVT_PEERS_DELETE_SUCCEEDED event.
     } else {
         whitelist_set(PM_PEER_ID_LIST_SKIP_NO_ID_ADDR);
-
+        switch_device_init();
         ret_code_t ret = ble_advertising_start(&m_advertising, BLE_ADV_MODE_FAST);
         APP_ERROR_CHECK(ret);
+    }
+}
+/**@brief 重新开启蓝牙广播.
+ * 
+ * @param[in] mode  广播模式
+ * @param[in] reset  是否重新绑定
+ */
+void advertising_restart(ble_adv_mode_t mode, bool reset)
+{
+    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
+        sd_ble_gap_adv_stop(m_advertising.adv_handle);
+        ble_advertising_start(&m_advertising, mode);
+    } else {
+        sd_ble_gap_disconnect(m_conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+    }
+
+    if (reset) {
+        ble_advertising_restart_without_whitelist(&m_advertising);
     }
 }
 
@@ -356,6 +413,7 @@ static void pm_evt_handler(pm_evt_t const* p_evt)
     switch (p_evt->evt_id) {
     case PM_EVT_CONN_SEC_SUCCEEDED:
         m_peer_id = p_evt->peer_id;
+        switch_device_update(m_peer_id);
         event_handler(USER_BLE_CONNECTED);
         break;
     case PM_EVT_BONDED_PEER_CONNECTED:
@@ -374,21 +432,20 @@ static void pm_evt_handler(pm_evt_t const* p_evt)
         }
         break;
 
+    case PM_EVT_CONN_SEC_CONFIG_REQ:
+        {
+        // allow pairing request from an already bonded peer.
+        pm_conn_sec_config_t conn_sec_config = { .allow_repairing = true };
+        pm_conn_sec_config_reply(p_evt->conn_handle, &conn_sec_config);
+
+        break;
+        }
+
     default:
         break;
     }
 }
 
-void restart_advertising_no_whitelist()
-{
-    ret_code_t err_code;
-    if (m_conn_handle == BLE_CONN_HANDLE_INVALID) {
-        err_code = ble_advertising_restart_without_whitelist(&m_advertising);
-        if (err_code != NRF_ERROR_INVALID_STATE) {
-            APP_ERROR_CHECK(err_code);
-        }
-    }
-}
 
 
 /**@brief Function for the GAP initialization.
@@ -806,7 +863,6 @@ void ble_services_init(evt_handler handler)
     peer_manager_init();
     gap_params_init();
     gatt_init();
-    switch_device_init();
     advertising_init();
     // services
     qwr_init();

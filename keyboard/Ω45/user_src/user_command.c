@@ -42,7 +42,9 @@ APP_TIMER_DEF(sleep_run_timer);
 APP_TIMER_DEF(bonds_run_timer);
 #ifdef Multi_DEVICE_SWITCH
 APP_TIMER_DEF(devices_run_timer);
+APP_TIMER_DEF(advertising_run_timer);
 uint8_t devices_id = 0;
+bool restart_without_whitelist = false;
 #endif
 
 /**
@@ -63,8 +65,9 @@ static void sleep_handler(void* p_context)
 static void bonds_handler(void* p_context)
 {
 #ifdef Multi_DEVICE_SWITCH
-    delete_bond_id(devices_id);
-    switch_device_id(devices_id);
+    switch_device_reset();
+    restart_without_whitelist = true;
+    app_timer_start(advertising_run_timer, APP_TIMER_TICKS(100), NULL);
 #else
     delete_bonds();
 #endif
@@ -73,7 +76,13 @@ static void bonds_handler(void* p_context)
 #ifdef Multi_DEVICE_SWITCH
 static void devices_handler(void* p_context)
 {
-    switch_device_id(devices_id);
+    switch_device_select(devices_id);
+    restart_without_whitelist = false;
+    app_timer_start(advertising_run_timer, APP_TIMER_TICKS(100), NULL);
+}
+static void advertising_handler(void* p_context)
+{
+    advertising_restart(BLE_ADV_MODE_FAST, restart_without_whitelist);
 }
 #endif
 /**
@@ -87,6 +96,7 @@ void command_timer_init(void)
     app_timer_create(&bonds_run_timer, APP_TIMER_MODE_SINGLE_SHOT, bonds_handler);
 #ifdef Multi_DEVICE_SWITCH
     app_timer_create(&devices_run_timer, APP_TIMER_MODE_SINGLE_SHOT, devices_handler);
+    app_timer_create(&advertising_run_timer, APP_TIMER_MODE_SINGLE_SHOT, advertising_handler);
 #endif
 }
 
@@ -117,29 +127,29 @@ bool command_extra(uint8_t code)
     case KC_O:
         //清空绑定数据
         clear_keyboard();
-        app_timer_start(bonds_run_timer, APP_TIMER_TICKS(1000), NULL);
+        app_timer_start(bonds_run_timer, APP_TIMER_TICKS(200), NULL);
         break;
         //多设备切换：支持3台设备切换
 #ifdef Multi_DEVICE_SWITCH
     case KC_Q:
         clear_keyboard();
         devices_id = 0;
-        app_timer_start(devices_run_timer, APP_TIMER_TICKS(200), NULL);
+        app_timer_start(devices_run_timer, APP_TIMER_TICKS(100), NULL);
         break;
     case KC_W:
         clear_keyboard();
         devices_id = 1;
-        app_timer_start(devices_run_timer, APP_TIMER_TICKS(200), NULL);
+        app_timer_start(devices_run_timer, APP_TIMER_TICKS(100), NULL);
         break;
     case KC_E:
         clear_keyboard();
         devices_id = 2;
-        app_timer_start(devices_run_timer, APP_TIMER_TICKS(200), NULL);
+        app_timer_start(devices_run_timer, APP_TIMER_TICKS(100), NULL);
         break;
 #endif
     case KC_R:
         clear_keyboard();
-        restart_advertising_no_whitelist();
+        advertising_restart(BLE_ADV_MODE_FAST, true);
         break;
         //RGB灯控制
 #ifdef RGBLIGHT_ENABLE
