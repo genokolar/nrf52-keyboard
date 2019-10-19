@@ -17,7 +17,7 @@ INC_FOLDERS += \
 	$(APP_SRC_DIR)/ble
 
 SRC_FILES += \
-	$(USER_SRC_DIR)/keymap_plain.c \
+	keymap_plain.c \
 	$(USER_SRC_DIR)/user_evt.c \
 	$(USER_SRC_DIR)/status_led.c \
 	$(USER_SRC_DIR)/user_fn.c \
