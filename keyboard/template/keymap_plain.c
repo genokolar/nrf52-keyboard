@@ -16,28 +16,43 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "keymap_common.h"
-#include "keyboard_fn.h"
+#include "user_fn.h"
 
 const uint8_t keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
-    /* 0: qwerty */
-    KEYMAP_ANSI(
-        GRV, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   MINS,EQL, BSPC, \
-        TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   LBRC,RBRC,BSLS, \
-        CAPS,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN,QUOT,     ENT,  \
-        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,DOT, SLSH,          RSFT, \
-        LCTL,LGUI,LALT,          SPC,                     FN0, RGUI,APP, RCTL),
-    /* 1: Poker Fn */
-    KEYMAP_ANSI(
-        ESC, F1,  F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11, F12, DEL, \
-        FN2,TRNS, UP, TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,CALC,TRNS,HOME,INS, TRNS,  \
-        FN1,LEFT,DOWN,RGHT,TRNS,TRNS,PSCR,SLCK,PAUS,TRNS,TRNS,END,      TRNS, \
-        TRNS,DEL, TRNS,WHOM,MUTE,VOLU,VOLD,TRNS,PGUP,PGDN,DEL,           TRNS, \
-        TRNS,TRNS,TRNS,          TRNS,                     TRNS,TRNS,TRNS,TRNS),
+    /* 0: default */
+    KEYMAP(
+        TAB, Q,   W,   E,   R,   T,   Y,   U,   I,   O,   P,   BSPC, \
+        CAPS,A,   S,   D,   F,   G,   H,   J,   K,   L,   SCLN, ENT,  \
+        LSFT,Z,   X,   C,   V,   B,   N,   M,   COMM,FN5, SLSH, FN6,  \
+        LCTL,LGUI,LALT,FN0,     SPC,            FN1, FN2, FN3, FN4),
+    /* 1: NUM */
+	KEYMAP(
+        ESC, 1,   2,   3,   4,   5,   6,   7,   8,   9,   0,   BSLS, \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,LBRC,RBRC,TRNS,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,UP  ,TRNS,TRNS, \
+        TRNS,TRNS,TRNS,TRNS,     TRNS,          LEFT,DOWN,RGHT,TRNS),
+    /* 2: F area */
+    KEYMAP(
+        F1,   F2,  F3,  F4,  F5,  F6,  F7,  F8,  F9,  F10, F11,  F12,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,MINS, EQL, TRNS,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE, TRNS,TRNS, \
+        TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
+    /* 3: other */
+    KEYMAP(
+        GRV, MYCM,MAIL,CALC,MSEL,TRNS,TRNS,TRNS,MPLY,MPRV,MNXT,  FN7,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,QUOT,  TRNS,  \
+        TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,TRNS,VOLD,VOLU,MUTE,TRNS,  TRNS, \
+        TRNS,TRNS,TRNS,TRNS,     TRNS,          TRNS,TRNS,TRNS,TRNS),
 };
 const action_t fn_actions[] = {
     /* Poker Layout */
-    ACTION_LAYER_MOMENTARY(1),  // to Fn overlay
-    ACTION_FUNCTION(POWER_SLEEP), // sleep
-    ACTION_FUNCTION(SWITCH_USB) // switch between usb and ble
+    [0] = ACTION_LAYER_TAP_KEY(1, KC_SPACE),
+    [1] = ACTION_LAYER_TAP_KEY(2, KC_DELETE),
+    [2] = ACTION_LAYER_TAP_KEY(3, KC_MINS),
+    [3] = ACTION_LAYER_TAP_KEY(3, KC_EQL),
+    [4] = ACTION_MODS(MOD_RCTL),
+    [5] = ACTION_FUNCTION(AF_TRICKY_SLSH),
+    [6] = ACTION_MODS_TAP_KEY(MOD_RSFT, KC_SLSH),
+    [7] = ACTION_FUNCTION(AF_POWER_SLEEP),
 };
 
