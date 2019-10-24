@@ -26,9 +26,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "keycode.h"
 #include "keymap.h"
 #include "main.h"
+#include "nrf_pwr_mgmt.h"
+#include "nrf_delay.h"
 #ifdef RGBLIGHT_ENABLE
 #include "rgblight.h"
 #endif
+#include "eeconfig.h"
 #include "status_led.h"
 #include "usb_comm.h"
 #include "user_func.h"
@@ -40,6 +43,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 APP_TIMER_DEF(bootloader_run_timer);
 APP_TIMER_DEF(sleep_run_timer);
 APP_TIMER_DEF(bonds_run_timer);
+APP_TIMER_DEF(reset_run_timer);
 #ifdef Multi_DEVICE_SWITCH
 APP_TIMER_DEF(devices_run_timer);
 APP_TIMER_DEF(advertising_run_timer);
@@ -73,6 +77,12 @@ static void bonds_handler(void* p_context)
 #endif
 }
 
+static void reset_handler(void* p_context)
+{
+    delete_bonds();
+    eeconfig_init();
+}
+
 #ifdef Multi_DEVICE_SWITCH
 static void devices_handler(void* p_context)
 {
@@ -94,6 +104,7 @@ void command_timer_init(void)
     app_timer_create(&bootloader_run_timer, APP_TIMER_MODE_SINGLE_SHOT, bootloader_handler);
     app_timer_create(&sleep_run_timer, APP_TIMER_MODE_SINGLE_SHOT, sleep_handler);
     app_timer_create(&bonds_run_timer, APP_TIMER_MODE_SINGLE_SHOT, bonds_handler);
+    app_timer_create(&reset_run_timer, APP_TIMER_MODE_SINGLE_SHOT, reset_handler);
 #ifdef Multi_DEVICE_SWITCH
     app_timer_create(&devices_run_timer, APP_TIMER_MODE_SINGLE_SHOT, devices_handler);
     app_timer_create(&advertising_run_timer, APP_TIMER_MODE_SINGLE_SHOT, advertising_handler);
@@ -193,6 +204,10 @@ bool command_extra(uint8_t code)
         rgblight_disable_noeeprom();
 #endif
         app_timer_start(sleep_run_timer, APP_TIMER_TICKS(1000), NULL);
+        break;
+    case KC_I:
+        clear_keyboard();
+        app_timer_start(reset_run_timer, APP_TIMER_TICKS(200), NULL);
         break;
     default:
         return false;
