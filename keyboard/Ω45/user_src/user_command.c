@@ -192,7 +192,6 @@ bool command_extra(uint8_t code)
 #ifdef RGBLIGHT_ENABLE
         rgblight_disable_noeeprom();
 #endif
-        matrix_uninit();
         app_timer_start(sleep_run_timer, APP_TIMER_TICKS(1000), NULL);
         break;
     default:
