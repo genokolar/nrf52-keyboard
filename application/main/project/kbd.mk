@@ -16,9 +16,7 @@ SRC_FILES += $(APP_SRC_DIR)/keyboard/keyboard_matrix.c \
     $(APP_SRC_DIR)/keyboard/keyboard_fn.c \
     $(APP_SRC_DIR)/keyboard/keyboard_led.c \
     $(APP_SRC_DIR)/keyboard/passkey.c \
-    $(APP_SRC_DIR)/keyboard/keyboard_bootmagic.c \
     $(APP_SRC_DIR)/keyboard/keymap_storage.c \
-    $(APP_SRC_DIR)/keyboard/sleep_reason.c \
     $(APP_SRC_DIR)/keyboard/keyboard_evt.c \
     $(APP_SRC_DIR)/keyboard/usb_comm.c \
 

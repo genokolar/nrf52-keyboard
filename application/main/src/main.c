@@ -80,11 +80,11 @@
 
 #include "app_scheduler.h"
 #include "app_timer.h"
-#include "nrf_pwr_mgmt.h"
-
 #include "ble/ble_bas_service.h"
 #include "ble/ble_hid_service.h"
 #include "ble/ble_services.h"
+#include "eeconfig.h"
+#include "nrf_pwr_mgmt.h"
 
 #include "main.h"
 
@@ -325,6 +325,9 @@ int main(void)
     ble_stack_init();
     scheduler_init();
     services_init();
+    if (!eeconfig_is_enabled()) {
+        eeconfig_init();
+    }
     ble_keyboard_init();
 
     // call custom init function

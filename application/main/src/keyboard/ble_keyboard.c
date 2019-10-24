@@ -17,17 +17,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "ble_keyboard.h" // self
 #include "../config/keyboard_config.h"
-#include "app_timer.h" // nordic
-#include "keyboard.h" // tmk
-#include "keyboard_host_driver.h"
-#include <stdint.h>
-
 #include "../main.h"
+#include "app_timer.h" // nordic
 #include "custom_hook.h"
 #include "hook.h"
+#include "keyboard.h" // tmk
+#include "keyboard_host_driver.h"
+#include "keyboard_led.h"
 #include "keymap_storage.h"
 #include "usb_comm.h"
-#include "keyboard_led.h"
+#include <stdint.h>
 
 #include "nrf_drv_wdt.h"
 
@@ -192,15 +191,12 @@ void ble_keyboard_powersave(bool save)
 void ble_keyboard_init(void)
 {
     keyboard_setup(); // 初始化各按键阵列
-    // - martix_setup();
     keyboard_led_init(); // 初始化LED
     keymap_init(); // 初始化自定义keymap
 #ifdef HAS_USB
     usb_comm_init(); // 初始化USB通讯
 #endif
-    keyboard_init(); // 初始化键盘所需的其他东西，包括按键阵列和Bootmagic
-    // - timer_init();
-    // - matrix_init();
+    keyboard_init(); // 初始化键盘所需的其他东西，如按键阵列
     host_set_driver(&driver); // 设置 host driver
     keyboard_timer_init(); // 初始化计时器
 #ifdef ENABLE_WATCHDOG
