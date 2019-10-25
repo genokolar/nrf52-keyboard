@@ -28,8 +28,7 @@ SRC_FILES += \
 	$(USER_SRC_DIR)/user_evt.c \
 	$(USER_SRC_DIR)/status_led.c \
 	$(USER_SRC_DIR)/user_fn.c \
-	$(USER_SRC_DIR)/user_func.c \
-	$(USER_SRC_DIR)/user_bootmagic.c
+	$(USER_SRC_DIR)/user_func.c
 
 ifeq (yes,$(strip $(COMMAND_ENABLE)))
     SRC_FILES += $(USER_SRC_DIR)/user_command.c
@@ -38,3 +37,4 @@ endif
 all: default ch554
 
 include $(APP_PROJ_DIR)/kbd.mk
+include $(USB_SOURCE_DIR)/usb.mk

@@ -123,9 +123,9 @@ void custom_event_handler(enum user_ble_event arg)
     switch (arg) {
     case USER_EVT_POST_INIT:
         status_led_init();
-        buttons_init();
         command_timer_init();
         status_led_display();
+        nrf_delay_ms(200);
         break;
     case USER_LED_ON:
         status_led_on();
