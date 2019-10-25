@@ -84,9 +84,9 @@
 #include "ble/ble_hid_service.h"
 #include "ble/ble_services.h"
 #include "eeconfig.h"
-#include "nrf_pwr_mgmt.h"
-
 #include "main.h"
+#include "nrf_pwr_mgmt.h"
+#include "power_button.h"
 
 #include "keyboard/ble_keyboard.h"
 #include "keyboard/keyboard_led.h"
@@ -329,7 +329,7 @@ int main(void)
         eeconfig_init();
     }
     ble_keyboard_init();
-
+    buttons_init();
     // call custom init function
     ble_user_event(USER_EVT_POST_INIT);
 

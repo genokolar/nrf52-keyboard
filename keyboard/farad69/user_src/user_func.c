@@ -65,16 +65,3 @@ void systemoff(void)
     ret_code_t err_code = sd_power_system_off();
     APP_ERROR_CHECK(err_code);
 }
-
-/**
-* @brief 初始化POWER_ON按钮
- * 
- */
-void buttons_init(void)
-{
-#ifdef POWER_BUTTON
-    nrf_gpio_cfg_sense_input(POWER_BUTTON,
-                             NRF_GPIO_PIN_PULLUP,
-                             NRF_GPIO_PIN_SENSE_LOW);
-#endif
-}
