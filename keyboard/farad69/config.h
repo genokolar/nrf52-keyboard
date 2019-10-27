@@ -52,10 +52,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)))
 
-// 定义Bootmagic按键
-#define BOOTMAGIC_KEY_BOOT KC_U /* 开机按键 */
-#define BOOTMAGIC_KEY_ERASE_BOND KC_E /* 删除所有绑定的按键 */
-
 // 键盘省电参数
 #define SLEEP_SLOW_TIMEOUT 15 // 键盘闲置多久后转入慢速扫描模式 (s)
 #define SLEEP_OFF_TIMEOUT 1200 // 键盘闲置多久后转入自动关机 (s)
@@ -81,9 +77,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 启用keymap存储
 #define KEYMAP_STORAGE
-
-// 直接开机而跳过开机条件检测，用于调试
-#define DEBUG_SKIP_PWRON_CHECK
 
 /* disable action features */
 //#define NO_ACTION_LAYER
