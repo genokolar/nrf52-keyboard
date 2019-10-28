@@ -89,7 +89,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define LED_CAPS 26  //caps led ：5 ； led1、2、3、4：19、20、27、26
 
 // ws2812 RGB 配置
-#define RGBLIGHT_ENABLE
+// #define RGBLIGHT_ENABLE
 #define RGB_DI_PIN 8
 #define RGBLED_NUM 8
 #define RGBLIGHT_ANIMATIONS
