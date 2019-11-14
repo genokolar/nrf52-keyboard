@@ -114,7 +114,7 @@ This is a TMK keyboard firmware for nRF52810, nRF51822 version see [here](https:
         `--application-version 必须不低于bootloader中的版本号，否则无法更新DFU`
 
 ### 蓝牙程序和USB控制器的编译
-现在蓝牙和USB控制器程序的Makefile都放在一起了。进入对应的硬件目录，直接make即可同步
+现在蓝牙和USB控制器程序的Makefile都放在一起了。进入对应的硬件目录，直接make即可。
 
 ```
 cd keyboard/lot60-ble
