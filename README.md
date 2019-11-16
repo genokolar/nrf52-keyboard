@@ -70,7 +70,8 @@ This is a TMK keyboard firmware for nRF52810, nRF51822 version see [here](https:
     ``` 
   - 编译bootloader
     将之前生成的public_key.c中密钥部分替换application/bootloader/dfu_public_key.c中对应的内容
-    ```shell
+    `如果希望保留更新线上DFU的兼容性，请不要更改此处公钥内容，并在在后续制作DFU的步骤中使用application/main/project下的private.key`
+    ```shell  
     /** @brief Public key used to verify DFU images */
     __ALIGN(4) const uint8_t pk[64] =
     {
@@ -78,6 +79,7 @@ This is a TMK keyboard firmware for nRF52810, nRF51822 version see [here](https:
         0x99, 0xf4, 0x66, 0x9c, 0x80, 0x8f, 0xda, 0x06, 0xae, 0xbc, 0xcf, 0x6b, 0x6a, 0x68, 0x1c, 0x91, 0x2d, 0x23, 0xf1, 0x9d, 0xb0, 0xec, 0x5c, 0x8d, 0xc6, 0x88, 0x97, 0x88, 0x66, 0x54, 0x5f, 0x14
     };
     ```
+
     ` 注意：必须确保bootloader编译是的公钥与下面介绍的打包DFU.zip使用的私钥是成对的，否则会导致无法引导加载固件 `
     ```bash
     cd application/bootloader/project/armgcc
@@ -92,7 +94,7 @@ This is a TMK keyboard firmware for nRF52810, nRF51822 version see [here](https:
       将private.key复制到keyboar/Ω45/_build
       update application
       ```bash
-      nrfutil pkg generate --hw-version 52 --application-version 1 --application nrf52_kbd.hex --sd-req 0xB8 --key-file private.key app_dfu_package.zip
+      nrfutil pkg generate --hw-version 52 --application-version 1 --application nrf52_kbd.hex --sd-req 0xB7 --key-file private.key app_dfu_package.zip
       ```
   - 完整包DFU制作
       - 编译键盘固件，参考application DFU制作
@@ -105,7 +107,8 @@ This is a TMK keyboard firmware for nRF52810, nRF51822 version see [here](https:
         mergehex --merge nrf52832_xxaa_bootloader.hex bootloader_setting.hex --output nrf_bootloader_wsetting.hex
         ```
       - 打包
-        `额外需要用到mergehex，在此处下载https://www.nordicsemi.com/Software-and-tools/Development-Tools/nRF-Command-Line-Tools/Download#infotabs`
+        `额外需要用到mergehex，在`[此处下载](https://www.nordicsemi.com/Software-and-tools/Development-Tools/nRF-Command-Line-Tools/Download#infotabs)
+
         update bootloader & softdevice & application
         ```bash
         cp ../../../application/bootloader/project/armgcc/_build/nrf52832_xxaa_bootloader.hex ./
