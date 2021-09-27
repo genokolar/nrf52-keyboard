@@ -23,16 +23,16 @@ jobs:
         wget https://sourceforge.net/projects/sdcc/files/sdcc-linux-amd64/4.0.0/sdcc-4.0.0-amd64-unknown-linux2.5.tar.bz2 -O /tmp/sdcc-4.0.0-amd64-unknown-linux2.5.tar.bz2
         tar xf /tmp/sdcc-4.0.0-amd64-unknown-linux2.5.tar.bz2 -C /tmp
         sudo cp -r /tmp/sdcc-4.0.0/* /usr/local
-        wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2 -O /tmp/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
-        tar xf /tmp/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2 -C /tmp
-        wget https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64.tar.gz -O /tmp/nRF-command-line-tools.tar.gz
+        wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -O /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
+        tar xf /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -C /tmp
+        wget https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-14-0/nRF-Command-Line-Tools_10_14_0_Linux64.zip -O /tmp/nRF-command-line-tools.zip
         mkdir /tmp/tools
-        tar xf /tmp/nRF-command-line-tools.tar.gz -C /tmp/tools
-        tar xf /tmp/tools/nRF-Command-Line-Tools_10_12_1.tar -C /tmp/tools
+        unzip /tmp/nRF-command-line-tools.zip -d /tmp/tools
         sudo cp -r /tmp/tools/mergehex /opt
         sudo ln -s /opt/mergehex/mergehex /usr/local/bin/mergehex
-        cp template/Makefile.posix.template template/Makefile.posix
-        sed -i "s/\/usr\/local/\/tmp/g" template/Makefile.posix
+        echo GNU_INSTALL_ROOT := /tmp/gcc-arm-none-eabi-9-2019-q4-major/bin/>template/Makefile.posix
+        echo GNU_VERSION := 9.2.1>>template/Makefile.posix
+        echo GNU_PREFIX := arm-none-eabi>>template/Makefile.posix
     - name: Make
       run: |
         cd keyboard
