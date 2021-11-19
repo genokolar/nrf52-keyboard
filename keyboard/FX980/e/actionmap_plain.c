@@ -32,9 +32,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define AC_FN5    ACTION_MODS_TAP_KEY(MOD_RCTL, KC_RGHT)
 #define AC_FN6    ACTION_FUNCTION(7)
 */
-#define AC_FN0    ACTION_LAYER_TOGGLE(1) 
-#define AC_FN1    ACTION_LAYER_TOGGLE(0) 
-
+#define AC_FN0 ACTION_LAYER_TAP_TOGGLE(1) 
+#define AC_FN1 ACTION_LAYER_TAP_TOGGLE(0)
 
 /* 
  * @brief 按键映射
@@ -48,7 +47,7 @@ const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	CAPS, A, S, D, F, G, H, J, K, L, SCLN, QUOT, ENT, P4, P5, P6,  
 	LSFT, Z, X, C, V, B, N, M, COMM, DOT, SLSH, RSFT, UP, P1, P2, P3, ENT, 
 	LCTL, LGUI, LALT, SPC, RALT, RGUI, MENU, RCTL, LEFT, DOWN, RGHT, P0, PDOT, VOLD, VOLU),
-		
+
 	[1] = ACTIONMAP_ROT(
         ESC, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, HOME, END, FN1, 
 	GRV, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, MINS, EQL, BSPC, INS, NLCK, PSLS, PAST, PMNS, 
