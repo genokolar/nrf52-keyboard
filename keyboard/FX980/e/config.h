@@ -136,9 +136,9 @@ static const uint8_t column_pin_array[MATRIX_COLS] = {16, 5, 7, 13, 18, 26, 27, 
 #define ROTARY_ENCODER_A 23
 #define ROTARY_ENCODER_B 24
 // 旋钮正向按钮映射
-#define ROTARY_ENCODER_POS 3,4
+#define ROTARY_ENCODER_POS 5,13
 // 旋钮负向按钮映射
-#define ROTARY_ENCODER_NEG 3,6
+#define ROTARY_ENCODER_NEG 5,14
 // 独立旋钮按键  用于关机后开机
 //#define ROTARY_BUTTON 10
 
