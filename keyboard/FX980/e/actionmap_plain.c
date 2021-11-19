@@ -32,6 +32,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #define AC_FN5    ACTION_MODS_TAP_KEY(MOD_RCTL, KC_RGHT)
 #define AC_FN6    ACTION_FUNCTION(7)
 */
+#define AC_FN0    ACTION_LAYER_TOGGLE(1) 
+#define AC_FN1    ACTION_LAYER_TOGGLE(0) 
+
 
 /* 
  * @brief 按键映射
