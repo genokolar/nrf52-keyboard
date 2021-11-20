@@ -164,12 +164,12 @@ static void ssd1306_show_all()
 /**
  * #@brief 清空Buff
  * 
- */
+ 
 void ssd1306_clr()
 {
     memset(ssd1306_display_buffer, 0, sizeof(ssd1306_display_buffer));
 }
-
+*/
 /**
  * @brief 进入睡眠状态
  * 
@@ -266,7 +266,7 @@ static void ssd1306_event_handler(enum user_event event, void* arg)
         case KBD_STATE_POST_INIT: // 初始化
             ssd1306_twi_init();
             ssd1306_oled_init();
-            //ssd1306_clr();
+            //ssd1306_clr();//显示Buff，开机后清空
             ssd1306_inited = true;
             break;
         case KBD_STATE_INITED: // 显示Buff
