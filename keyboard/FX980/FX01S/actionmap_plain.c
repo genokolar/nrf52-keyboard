@@ -54,7 +54,7 @@ const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	GRV, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, MINS, EQL, BSPC, INS, NLCK, PSLS, PAST, PMNS, 
 	TAB, Q, W, E, R, T, Y, U, I, O, P, LBRC, RBRC, BSLS, DEL, P7, P8, P9, PPLS, 
 	CAPS, A, S, D, F, G, H, J, K, L, SCLN, QUOT, ENT, P4, P5, P6,  
-	LSFT, Z, X, C, V, B, N, M, COMM, DOT, SLSH, RSFT, UP, P1, P2, P3, ENT, 
+	LSFT, Z, X, C, V, B, N, M, COMM, DOT, SLSH, RSFT, UP, P1, P2, P3, PENT, 
 	LCTL, LGUI, LALT, SPC, RALT, RGUI, MENU, RCTL, LEFT, DOWN, RGHT, P0, PDOT, VOLD, VOLU),
 
 	[1] = ACTIONMAP_ROT(
@@ -62,7 +62,7 @@ const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
 	GRV, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, MINS, EQL, BSPC, INS, NLCK, PSLS, PAST, PMNS, 
 	TAB, Q, W, E, R, T, Y, U, I, O, P, LBRC, RBRC, BSLS, DEL, P7, P8, P9, PPLS, 
 	CAPS, A, S, D, F, G, H, J, K, L, SCLN, QUOT, ENT, P4, P5, P6,  
-	LSFT, Z, X, C, V, B, N, M, COMM, DOT, SLSH, RSFT, UP, P1, P2, P3, ENT, 
+	LSFT, Z, X, C, V, B, N, M, COMM, DOT, SLSH, RSFT, UP, P1, P2, P3, PENT, 
 	LCTL, LGUI, LALT, SPC, RALT, RGUI, MENU, RCTL, LEFT, DOWN, RGHT, P0, PDOT, BRTD, BRTI),
 
 	[2] = ACTIONMAP(
