@@ -50,7 +50,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = { 
 	[0] = ACTIONMAP_ROT(
-        ESC, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, VOLD, VOLU, FN0, 
+        ESC, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, HOME, END, FN0, 
 	GRV, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, MINS, EQL, BSPC, INS, NLCK, PSLS, PAST, PMNS, 
 	TAB, Q, W, E, R, T, Y, U, I, O, P, LBRC, RBRC, BSLS, DEL, P7, P8, P9, PPLS, 
 	CAPS, A, S, D, F, G, H, J, K, L, SCLN, QUOT, ENT, P4, P5, P6,  
