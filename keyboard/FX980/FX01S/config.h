@@ -155,7 +155,7 @@ static const uint8_t column_pin_array[MATRIX_COLS] = {16, 5, 7, 13, 18, 26, 27, 
 #define DEBOUNCE 5 /* 硬件消抖次数，设置为0则不消抖 */
 #define MATRIX_SCAN_DELAY_CYCLE 48 /* 按键扫描等待IO稳定的延时时长 */
 
-/*/ 采用内部RC
+// 采用内部RC
 #define NRFX_CLOCK_CONFIG_LF_SRC 0
 #define CLOCK_CONFIG_LF_SRC 0
 #define NRF_SDH_CLOCK_LF_SRC 0
@@ -163,7 +163,7 @@ static const uint8_t column_pin_array[MATRIX_COLS] = {16, 5, 7, 13, 18, 26, 27, 
 #define NRF_SDH_CLOCK_LF_RC_TEMP_CTIV 2
 #define NRF_SDH_CLOCK_LF_ACCURACY 1
 
-//配置RTC预分频器.
+/*/配置RTC预分频器.
 // <0> 32MHz <1> 16MHz <3> 8MHz <7> 4MHz <15> 2MHz <31> 1MHz 
 #define APP_TIMER_CONFIG_RTC_FREQUENCY 0
 */
