@@ -41,7 +41,7 @@ extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
 	K30, K31, K32, K33, K34, K35, K36, K37, K38, K39, K90, K91, K94, K85, K86, K79, \
 	K40, K41, K42, K43, K44, K45, K46, K47, K48, K49, K92, K93, K95, K96, K87, K88, K89, \
 	K50, K51, K52, K53, K54, K55, K56, K57, K58, K59, K97, K98, K99, \
-	K100, K101 \
+	K9A, K9B \
 ) { \
 	{ AC_##K00, AC_##K01, AC_##K02, AC_##K03, AC_##K04, AC_##K05, AC_##K06, AC_##K07, AC_##K08, AC_##K09, AC_NO }, \
 	{ AC_##K10, AC_##K11, AC_##K12, AC_##K13, AC_##K14, AC_##K15, AC_##K16, AC_##K17, AC_##K18, AC_##K19, AC_NO }, \
@@ -53,7 +53,7 @@ extern const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS];
 	{ AC_##K70, AC_##K71, AC_##K72, AC_##K73, AC_##K74, AC_##K75, AC_##K76, AC_##K77, AC_##K78, AC_##K79, AC_NO }, \
 	{ AC_##K80, AC_##K81, AC_##K82, AC_##K83, AC_##K84, AC_##K85, AC_##K86, AC_##K87, AC_##K88, AC_##K89, AC_NO }, \
 	{ AC_##K90, AC_##K91, AC_##K92, AC_##K93, AC_##K94, AC_##K95, AC_##K96, AC_##K97, AC_##K98, AC_##K99, AC_NO }, \
-	{ AC_##K100, AC_##K101 }  \
+	{ AC_##K9A, AC_##K9B }  \
 }
 
 #define ACTIONMAP( \
