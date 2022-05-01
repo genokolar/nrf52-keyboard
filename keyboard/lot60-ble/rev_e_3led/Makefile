@@ -1,5 +1,0 @@
-HARDWARE_VERSION = REV_E
-THREE_LED_STATUS = yes
-COMMON_ROOT = ../common
-
-include $(COMMON_ROOT)/common.mk
