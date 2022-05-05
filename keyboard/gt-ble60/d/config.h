@@ -49,7 +49,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 键盘额外功能
 //#define DYNAMIC_TX_POWER /* 启用自动发射功率调整 */
-//#define PASSKEY_REQUIRED /* 需要输入配对码 */
+#define PASSKEY_REQUIRED /* 需要输入配对码 */
 #define ENABLE_WATCHDOG /* 启用看门狗 */
 #define HIGH_TX_POWER /* 更改发射功率到+4dBm */
 #define MULTI_DEVICE_SWITCH  /*启用多设备切换 */
@@ -69,7 +69,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_FUNCTION
 
 // LED 配置
-#define LED_CAPS 26  //caps led ：5 ； led1、2、3、4：19、20、27、26
+#define LED_CAPS 5  //caps led ：5 ； led1、2、3、4：19、20、27、26
 
 // ws2812 RGB 配置
 #define RGB_DI_PIN 8
@@ -80,7 +80,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 3灯指示配置引脚
 #define LED_STATUS_BLE 20
-#define LED_STATUS_CHARGING 19
+#define LED_STATUS_CHARGING 26
 #define LED_STATUS_USB 27
 #define LED_BLE_CHANNEL1 20
 #define LED_BLE_CHANNEL2 27
@@ -100,7 +100,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define BATTERY_ADC_PIN NRF_SAADC_INPUT_AIN0 // 电量检测引脚 Pin 2
 
 // 充电检测配置
-#define PIN_CHARGING !UCC1
+//#define PIN_CHARGING !UCC1
 //#define PIN_STANDBY !UCC2
 
 // 按键阵列配置
