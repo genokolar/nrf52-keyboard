@@ -1,57 +1,53 @@
+ROOT_DIR := ../..
+APP_MAIN_DIR := $(ROOT_DIR)/application/main
+TMK_CORE_DIR := $(ROOT_DIR)/tmk/tmk_core
+USB_SOURCE_DIR := $(ROOT_DIR)/usb
 OUTPUT_DIR = _build
-SUBDIRS=$(filter-out _build common,$(shell ls -l | grep ^d | awk '{print $$9}'))
 
+APP_PROJ_DIR := $(APP_MAIN_DIR)/project
+APP_SRC_DIR := $(APP_MAIN_DIR)/src
+USER_SRC_DIR := $(APP_SRC_DIR)/user/glab
+
+CONFIG_H = config.h
+CONFIG_H_DIR = .
+
+include ./rules.mk
+
+INC_FOLDERS += \
+	. \
+	$(USER_SRC_DIR) \
+
+
+ifeq (yes,$(strip $(ACTIONMAP_ENABLE)))
+	SRC_FILES += actionmap_plain.c
+else
+	SRC_FILES += keymap_plain.c
+endif
+
+SRC_FILES += $(USER_SRC_DIR)/user_fn.c
+
+# 发布相关设置
+export VERSION=11$(shell git log --abbrev-commit --pretty=oneline -1 | cut -c 1-6 || echo 'unknown')
+export BUILDTIME=$(shell date +"%Y%m%d")
+export FILE_VERSION = $(BUILDTIME)-$(VERSION)
 
 ## 如果上层Makefile传递了OUTPUT_DIRECTORY
 ifdef OUTPUT_DIRECTORY
-OUTPUT_DIR = $(OUTPUT_DIRECTORY)
-export RELEASE_DIR = ../$(OUTPUT_DIR)/..
+OUTPUT_DIR = ../$(OUTPUT_DIRECTORY)
+ifndef RELEASE_DIR
+export RELEASE_DIR = $(OUTPUT_DIRECTORY)/..
 endif
-ifndef BUILD_PREFIX
-BUILD_PREFIX = "newhope64"
+NRF_KBD_NAME = $(RELEASE_DIR)/$(BUILD_PREFIX)-$(NRF_CHIP)_kbd-$(FILE_VERSION).hex
+NRF_PACKAGE_NAME=$(RELEASE_DIR)/$(BUILD_PREFIX)-$(NRF_CHIP)_dfu-$(FILE_VERSION).zip
+OUTPUT_BIN=$(RELEASE_DIR)/$(BUILD_PREFIX)-ch554-$(FILE_VERSION).bin
+NRF_MERGE_SIGN_NAME=$(RELEASE_DIR)/$(BUILD_PREFIX)-$(NRF_CHIP)_kbd_sign-$(FILE_VERSION).hex
+NRF_MERGE_ALL_NAME=$(RELEASE_DIR)/$(BUILD_PREFIX)-$(NRF_CHIP)_all-$(FILE_VERSION).hex
 endif
 
-.PHONY: clean release package usb merge_setting all dist_clean
+release: kbd package ch554 all
 
-package: release
-usb: 
-	@echo use make release to build your release firmware.
-merge_setting: 
-	@echo use make release to build your release firmware.
-all: 
-	@echo use make release to build your release firmware.
 
-release: $(SUBDIRS)
+# END 发布设置
 
-$(SUBDIRS): $(OUTPUT_DIR)
-	@-mkdir -p $(OUTPUT_DIR)/$@
-	@make -C $@ release OUTPUT_DIRECTORY=../$(OUTPUT_DIR)/$@ BUILD_PREFIX=$(BUILD_PREFIX)-$@
-
-$(OUTPUT_DIR):
-	@-mkdir -p $(OUTPUT_DIR)
-
-dist_clean: 
-	-rm -r $(OUTPUT_DIR)/*/
-
-clean:
-	-rm -r $(OUTPUT_DIR)
-
-# Print all targets that can be built
-help:
-	@echo following targets are available:
-	@echo		nrf52_kbd           - default： build KBD firmware
-	@echo		setting             - generate dfu setting
-	@echo		bootloader          - build BootLoader firmware
-	@echo		package             - pack firmware for DFU
-	@echo		all                 - merge bootloader softdevice and dfu setting with application
-	@echo		erase               - erase the chip
-	@echo		merge_setting       - merge dfu setting with application
-	@echo		merge_softdevice    - merge softdevice with application
-	@echo		flash               - Flashing KBD firmware
-	@echo		flash_setting       - Flashing KBD firmware and dfu setting
-	@echo		flash_bootloader    - Flashing bootloader
-	@echo		flash_softdevice    - Flashing softdevice
-	@echo		flash_all           - Flashing bootloader softdevice and application with dfu setting
-	@echo		release             - make all keyboards firmware in the keyboard folder
-	@echo All targets starts with "flash" could has prefix "pyocd_" or "openocd", which \
-	means use pyocd  or openocd to flash chip. 
+include $(APP_PROJ_DIR)/kbd.mk
+include $(USB_SOURCE_DIR)/usb.mk
