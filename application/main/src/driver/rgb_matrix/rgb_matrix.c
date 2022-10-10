@@ -175,7 +175,9 @@ void eeconfig_update_rgb_matrix(void) {
 void eeconfig_update_rgb_matrix_default(void)
 {
     rgb_matrix_config.enable = 1;
-    rgb_matrix_config.indicators = 1;
+    //修改默认无指示灯
+    //lingyi
+    rgb_matrix_config.indicators = 0;
     rgb_matrix_config.mode = RGB_MATRIX_STARTUP_MODE;
     rgb_matrix_config.hsv = (HSV) { RGB_MATRIX_STARTUP_HUE, RGB_MATRIX_STARTUP_SAT, RGB_MATRIX_STARTUP_VAL };
     rgb_matrix_config.speed = RGB_MATRIX_STARTUP_SPD;
@@ -504,13 +506,21 @@ __attribute__((weak)) void rgb_matrix_indicators_advanced_user(uint8_t led_min, 
 //根据指示灯与RGB灯状态控制RGB电源开关
 static void rgb_matrix_toggle_pwr(void)
 {
-    if (!rgb_matrix_config.indicators && !rgb_matrix_config.enable) {
+    // if (!rgb_matrix_config.indicators && !rgb_matrix_config.enable) 
+    // if (!rgb_matrix_config.enable) 
+    // {
+    //     ws2812_pwr_off();
+    // } else if (rgb_matrix_config.indicators) {
+    //     ws2812_pwr_on();
+    //     power_save_reset();
+    // } else if (rgb_matrix_config.enable) {
+    //     ws2812_pwr_on();
+    // }
+    if (rgb_matrix_config.enable) {
+        ws2812_pwr_on();
+    }
+    else{
         ws2812_pwr_off();
-    } else if (rgb_matrix_config.indicators) {
-        ws2812_pwr_on();
-        power_save_reset();
-    } else if (rgb_matrix_config.enable) {
-        ws2812_pwr_on();
     }
 }
 

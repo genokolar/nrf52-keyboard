@@ -1,3 +1,5 @@
-GNU_INSTALL_ROOT := C:/Program Files (x86)/GNU Arm Embedded Toolchain/9 2020-q2-update/bin/
-GNU_VERSION := 9.3.1
+GNU_INSTALL_ROOT := E:/keyboard/nrf52/nrf52_keyboard_compile_tools/GCC/2019q4/bin/
+GNU_VERSION := 9.2.1
 GNU_PREFIX := arm-none-eabi
+OPENOCD := E:/keyboard/nrf52/nrf52_keyboard_compile_tools/openocd.exe
+OPENOCD_CFG:= E:/keyboard/nrf52/nrf52_keyboard_compile_tools/nrf52.cfg
