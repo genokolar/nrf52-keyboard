@@ -51,6 +51,7 @@ ifeq (yes,$(strip $(RGBLIGHT_ENABLE)))
                 $(DRIVER_DIR)/rgb_matrix/rgblight.c \
                 $(DRIVER_DIR)/rgb_matrix/color.c \
                 $(DRIVER_DIR)/rgb_matrix/led_tables.c \
+                $(DRIVER_DIR)/rgb_matrix/rgblight_ctrl.c \
                 $(SDK_ROOT)/modules/nrfx/drivers/src/nrfx_pwm.c
     OPT_DEFS += -DNRFX_PWM_ENABLED=1 -DNRFX_PWM0_ENABLED=1 -DPWM_ENABLED=1 -DPWM0_ENABLED=1 -DRGBLIGHT_ENABLE -DUSE_CIE1931_CURVE
 endif

@@ -99,6 +99,7 @@
 #include "keyboard/keyboard_led.h"
 #include "keyboard/keyboard_matrix.h"
 #include "protocol/usb_comm.h"
+#include "sleep_reason.h"
 
 #define DEAD_BEEF 0xDEADBEEF /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 #if APP_TIMER_CONFIG_USE_SCHEDULER == 1
@@ -376,6 +377,12 @@ if (!sleep_flag)
 #endif
     advertising_start(erase_bonds);
 
+#if !defined(BOOTMAGIC_ENABLE) && defined(BOOTCHECK_ENABLE)
+    //恢复sleep reason
+    if (!sleep_reason_get()) {
+        sleep_reason_set(true);
+    }
+#endif
     trig_event_param(USER_EVT_STAGE, KBD_STATE_INITED);
 }
     // Enter main loop.
