@@ -33,7 +33,7 @@ export FILE_VERSION = $(BUILDTIME)-$(VERSION)
 
 ## 如果上层Makefile传递了OUTPUT_DIRECTORY
 ifdef OUTPUT_DIRECTORY
-OUTPUT_DIR = ../$(OUTPUT_DIRECTORY)
+OUTPUT_DIR = $(OUTPUT_DIRECTORY)
 ifndef RELEASE_DIR
 export RELEASE_DIR = $(OUTPUT_DIRECTORY)/..
 endif
@@ -46,10 +46,10 @@ endif
 
 release: kbd package ch554 all
 ## 发布时同步生成指定的NRF_CHIP固件
-	@echo make -C $(CONFIG_H_DIR) all NRF_CHIP=nrf52810 OUTPUT_DIRECTORY=$(OUTPUT_DIR)
-	@make -C $(CONFIG_H_DIR) all NRF_CHIP=nrf52810 OUTPUT_DIRECTORY=$(OUTPUT_DIR) 
-	@echo make -C $(CONFIG_H_DIR) kbd NRF_CHIP=nrf52810 OUTPUT_DIRECTORY=$(OUTPUT_DIR)
-	@make -C $(CONFIG_H_DIR) kbd NRF_CHIP=nrf52810 OUTPUT_DIRECTORY=$(OUTPUT_DIR) 
+	@echo make -C $(CONFIG_H_DIR) all NRF_CHIP=nrf52810
+	@make -C $(CONFIG_H_DIR) all NRF_CHIP=nrf52810 
+	@echo make -C $(CONFIG_H_DIR) kbd NRF_CHIP=nrf52810
+	@make -C $(CONFIG_H_DIR) kbd NRF_CHIP=nrf52810 
 
 # END 发布设置
 
