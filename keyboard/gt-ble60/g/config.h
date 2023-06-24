@@ -27,7 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CONF_PRODUCT_ID 0x031B /* 配置项目内显示的ProductID */
 #define DEVICE_VER 0x0001 /* 硬件版本 */
 #define MANUFACTURER "Glab" /* 硬件制造商，用于蓝牙显示 */
-#define PRODUCT "GT BLE60G" /* 硬件名词，用于蓝牙显示 */
+#define PRODUCT "GT BLE60Gh" /* 硬件名词，用于蓝牙显示 */
 #define MACADDR_SEPRATOR ' ' /* 蓝牙名称后地址的分隔符。若不设置则不显示蓝牙名称后面的地址 */
 
 /* USB HID report parameter */
@@ -142,7 +142,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 /* key combination for command */
 #define IS_COMMAND() ( \
-    keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)))
+    keyboard_report->mods == (MOD_BIT(KC_LGUI) | MOD_BIT(KC_RGUI)))
 
 static const uint8_t row_pin_array[MATRIX_ROWS] = {10, 9, 8, 11, 17};
 static const uint8_t column_pin_array[MATRIX_COLS] = {25, 26, 27, 28, 29, 30, 31, 12, 13, 14, 15, 16, 22, 5};
