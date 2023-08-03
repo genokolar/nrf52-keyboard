@@ -14,6 +14,6 @@ RGB_MATRIX_ENABLE = yes     #启用WS2812 RGB矩阵灯
 # THREE_LED_STATUS = yes    #启用键盘运行状态灯
 # ONBOARD_CMSIS_DAP = yes   # 启用板载调试器
 # RGB_LIGHT_ENABLE = yes     #启用RGB轴灯
-# ROTARY_ENCODER = yes # 启用编码器
+ROTARY_ENCODER = yes # 启用编码器
 # SSD1306_OLED = yes
 ACTIONMAP_ENABLE =yes

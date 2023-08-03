@@ -265,6 +265,35 @@ const uint8_t LangStringDesc[] = {
     0x09, 0x04,    // 0x0409 for English
 };
 
+// const uint8_t InterfaceStringDesc[] = {
+//     // String index5, Interface String
+//     26,        // Length of this string descriptor
+//     3,        // bDescriptorType
+//     'H',0x00,'I',0x00,'D',0x00,' ',0x00,'K',0x00,'e',0x00,
+//     'y',0x00,'b',0x00,'o',0x00,'a',0x00,'r',0x00,'d',0x00,
+
+//     // String index6, Interface String
+//     36,        // Length of this string descriptor
+//     3,        // bDescriptorType
+//     'E',0x00,'x',0x00,'t',0x00,'r',0x00,'a',0x00,' ',0x00,
+//     'K',0x00,'e',0x00,'y',0x00,' ',0x00,'S',0x00,'u',0x00,
+//     'p',0x00,'p',0x00,'o',0x00,'r',0x00,'t',0x00,
+
+//     // String index7, Interface String
+//     26,        // Length of this string descriptor
+//     3,        // bDescriptorType
+//     'L',0x00,'i',0x00,'n',0x00,' ',0x00,'k',0x00,'e',0x00,
+//     'y',0x00,'b',0x00,'o',0x00,'a',0x00,'r',0x00,'d',0x00,
+// #ifdef ONBOARD_CMSIS_DAP
+//     // String index 7, Interface String
+//     20,     // Length of this string descriptor
+//     3,      // bDescriptorType
+//     'C',0x00,'M',0x00,'S',0x00,'I',0x00,'S',0x00,'-',0x00,
+//     'D',0x00,'A',0x00,'P',0x00,
+// #endif
+// };
+
+
 const uint8_t InterfaceStringDesc[] = {
     // String index5, Interface String
     26,        // Length of this string descriptor

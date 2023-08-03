@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Webhid Example</title>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f5f5;
+    }
+
+    h1 {
+      margin-bottom: 2rem;
+    }
+
+    button {
+      padding: 1rem 2rem;
+      font-size: 1.5rem;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0062cc;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <button id="connectButton">ConnectToReset</button>
+    <br>
+    <button id="disconnectButton">DisConnectToReset</button>
+  </div>
+
+</body>
+
+</html>
+
+<script>
+  let device;
+
+  async function connectToDevice() {
+    try {
+      const devices = await navigator.hid.requestDevice({
+        // filters: [{ vendorId: 0x0601, productId: 0x0202, usagePage: 65280 }],
+        filters: [{ usagePage: 65280 }],
+      });
+      if (devices.length === 0) {
+        console.log("No device found");
+        return;
+      }
+      device = devices[0];
+      await device.open();
+      console.log("Device opened");
+
+      // type:0
+      // usage:1
+      // usagePage:65280
+      console.log(device);
+      // await resetDevice();
+      // await getSingleKeycode();
+      await getAllKeycodes();
+    } catch (error) {
+      console.error("An error occurred while connecting to the device:", error);
+    }
+  }
+
+  async function resetDevice() {
+    try {
+      // const resetCommand = new Uint8Array([0xf0]);
+      // await device.sendReport(0x3f, resetCommand);
+
+      const cmd = new Uint8Array([0x20]);
+      // console.log(device);
+      device.sendReport(0x3f, cmd);
+      // device.addEventListener('inputreport', event => {
+      //   // event.data 包含接收到的输入报告
+      //   // console.log('Received input report:', event.data);
+      //   console.log('Received input report:', event.data.buffer.byteLength);
+      // });
+      device.oninputreport = ({ device, reportId, data }) => {
+        const inputData = new Uint8Array(data.buffer);
+
+        // const vid = (inputData[3]<<2+inputData[2]).toString(16);
+        // const pid = (inputData[5]<<2+inputData[4]).toString(16);
+
+        const vid = '0x' + inputData[3].toString(16) + '' + inputData[2].toString(16);
+        const pid = '0x' + inputData[5].toString(16) + '' + inputData[4].toString(16);
+        // console.log(vid);
+
+        console.table({ vid, pid });
+
+        console.log(inputData);
+        // console.log(`Input report ${reportId} from ${device.productName}:`, inputData);
+      }
+    } catch (error) {
+      console.error("An error occurred while resetting the device:", error);
+    }
+  }
+
+  async function disconnectFromDevice() {
+    if (device) {
+      await device.close();
+      device = null;
+      console.log("Device disconnected");
+    }
+  }
+
+
+  function getSingleKeycode() {
+    const cmd = new Uint8Array([0x23]);
+    device.sendReport(0x3f, cmd);
+    device.oninputreport = ({ device, reportId, data }) => {
+      const inputData = new Uint8Array(data.buffer);
+
+      console.log(inputData);
+    }
+  }
+
+
+
+  let offset = 0;
+
+  function getAllKeycodes() {
+    const cmd = new Uint8Array([0x23, 2,offset & 0xFF, (offset >> 8) & 0xFF]);
+    device.sendReport(0x3f, cmd);
+    device.oninputreport = ({ device, reportId, data }) => {
+      const inputData = new Uint8Array(data.buffer);
+      console.log(inputData);
+      const len = inputData[1];
+      const keycodes = inputData.slice(2, len + 2);
+      console.log("---------------------");
+      
+      console.log(keycodes);
+      console.log("---------------------");
+
+      offset += len;
+
+      // console.log(keycodes);
+
+      if (len === 0 ) {
+        // 已经响应完毕或达到最大数据长度，结束获取
+        return;
+      }
+
+      // 继续请求下一批数据
+      getAllKeycodes();
+    };
+  }
+
+
+  document.getElementById("connectButton").addEventListener("click", connectToDevice);
+  document.getElementById("disconnectButton").addEventListener("click", disconnectFromDevice);
+
+</script>

@@ -1,6 +1,6 @@
 # 配置项：主控芯片类型
 # 可选：nrf52810 或 nrf52832
-NRF_CHIP := nrf52832
+NRF_CHIP := nrf52810
 
 # 配置项：功能选项
 # BOOTMAGIC_ENABLE = yes  # 启用Bootmagic

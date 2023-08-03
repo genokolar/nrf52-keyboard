@@ -21,13 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 /* USB和蓝牙的显示参数 */
-#define VENDOR_ID 0x0606 /* USB VID */
-#define PRODUCT_ID 0x0101 /* USB PID */
+#define VENDOR_ID 0x0601 /* USB VID */
+#define PRODUCT_ID 0x0204 /* USB PID */
 #define CONF_VENDOR_ID 0x0601 /* 配置项目内显示的VendorID */
-#define CONF_PRODUCT_ID 0x0106 /* 配置项目内显示的ProductID */
-#define DEVICE_VER 0x0001 /* 硬件版本 */
+#define CONF_PRODUCT_ID 0x0204 /* 配置项目内显示的ProductID */
+#define DEVICE_VER 0x000A /* 硬件版本 */
 #define MANUFACTURER "Lin" /* 硬件制造商，用于蓝牙显示 */
-#define PRODUCT "Lin Pad" /* 硬件名词，用于蓝牙显示 */
+#define PRODUCT "Yu75" /* 硬件名词，用于蓝牙显示 */
 // #define MACADDR_SEPRATOR ' ' /* 蓝牙名称后地址的分隔符。若不设置则不显示蓝牙名称后面的地址 */
 
 /* USB HID report parameter */
@@ -58,44 +58,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MACRO_STORAGE /* 启用宏存储功能 */
 #define CONFIG_STORAGE /* 启用配置存储功能 */
 
-// #define DEBUG_SKIP_PWRON_CHECK /*  直接开机而跳过开机条件检测，用于调试 */
-
-/* TMK固件内置功能 */
-/* disable action features */
-//#define NO_ACTION_LAYER
-//#define NO_ACTION_TAPPING
-//#define NO_ACTION_ONESHOT
-//#define NO_ACTION_MACRO
-//#define NO_ACTION_FUNCTION
-
-// LED 配置
-// #define LED_CAPS 4  //caps led ：5 ； led1、2、3、4：19、20、27、26
-
-// ws2812 RGB 配置
-#define RGB_DI_PIN 27
-#define RGBLED_NUM 17
-#define DRIVER_LED_TOTAL RGBLED_NUM
-#define RGBLIGHT_ANIMATIONS
-#define RGB_PWR_PIN 18 // P-mos
-// #define RGB_PWR_PIN_REVERSE 3 // P-mos
-//#define RGB_PWR_PIN_REVERSE 12 // N-mos
-
-//RGB_MATRIX 配置
-#define RGB_MATRIX_KEYPRESSES // reacts to keypresses
-//#define RGB_MATRIX_KEYRELEASES // reacts to keyreleases (instead of keypresses)
-#define RGB_MATRIX_FRAMEBUFFER_EFFECTS // enable framebuffer effects
-#define RGB_DISABLE_TIMEOUT 0 // number of milliseconds to wait until rgb automatically turns off
-#define RGB_DISABLE_AFTER_TIMEOUT 2 // OBSOLETE: number of ticks to wait until disabling effects
-//#define RGB_MATRIX_LED_PROCESS_LIMIT (DRIVER_LED_TOTAL + 4) / 5 // limits the number of LEDs to process in an animation per task run (increases keyboard responsiveness)
-#define RGB_MATRIX_LED_FLUSH_LIMIT 16 // limits in milliseconds how frequently an animation will update the LEDs. 16 (16ms) is equivalent to limiting to 60fps (increases keyboard responsiveness)
-#define RGB_MATRIX_MAXIMUM_BRIGHTNESS 200 // limits maximum brightness of LEDs to 200 out of 255. If not defined maximum brightness is set to 255
-//#define RGB_MATRIX_STARTUP_MODE RGB_MATRIX_CYCLE_LEFT_RIGHT // Sets the default mode, if none has been set
-#define RGB_MATRIX_STARTUP_HUE 0 // Sets the default hue value, if none has been set
-#define RGB_MATRIX_STARTUP_SAT 255 // Sets the default saturation value, if none has been set
-#define RGB_MATRIX_STARTUP_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS // Sets the default brightness value, if none has been set
-#define RGB_MATRIX_CENTER { 40,110 }
-// #define RGB_MATRIX_INDICATORS_HOST 1
-
 // 3灯指示配置引脚
 // #define LED_STATUS_BLE 19
 // #define LED_STATUS_CHARGING 18
@@ -105,12 +67,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define LED_BLE_CHANNEL3 18
 #define LED_POSITIVE // LED上拉驱动
 
-// RGB 配置
-//#define LED_RGB_CC // 是否为共阴LED
-//#define LED_RGB_R 5
-//#define LED_RGB_G 4
-//#define LED_RGB_B 3
-//#define RGB_LIGHT_ANIMATIONS
 
 // 独立硬件按钮
 // #define POWER_BUTTON 21
@@ -119,8 +75,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HAS_USB // 启用与CH554的通信支持
 // #define UART_RXD 7 // UART_RX口IO 17
 // #define UART_TXD 8 // UART_TX口IO 18
-#define UART_RXD 20 // UART_RX口IO 17
-#define UART_TXD 21 // UART_TX口IO 18
+#define UART_RXD 22 // UART_RX口IO 17
+#define UART_TXD 23 // UART_TX口IO 18
 //#define UART_DET 19 // UART 检测引脚，若此脚被拉低，则说明USB正在工作。若不配置则使用RX口作为检测引脚
 #define UART_BAUDRATE NRF_UART_BAUDRATE_115200 // 通信波特率，请不要修改
 
@@ -135,15 +91,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define LED_DFU_FINISH 3
 
 // 按键阵列配置
-#define MATRIX_ROWS 5 /* 硬件阵列行数 */
-#define MATRIX_COLS 4/* 硬件阵列列数 */
+#define MATRIX_ROWS 6 /* 硬件阵列行数 */
+#define MATRIX_COLS 15/* 硬件阵列列数 */
 
 /* key combination for command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)))
 
-static const uint8_t row_pin_array[MATRIX_ROWS] = {22,13,15,25,23};
-static const uint8_t column_pin_array[MATRIX_COLS] = {6,9,10,26};
+static const uint8_t row_pin_array[MATRIX_ROWS] = {19,18,20,21,10,24};
+static const uint8_t column_pin_array[MATRIX_COLS] = {25,9,31,30,29,28,27,26,11,12,13,14,15,16,17};
 
 #define ROW_IN // 键盘阵列的二极管方向是从COL->ROW
 

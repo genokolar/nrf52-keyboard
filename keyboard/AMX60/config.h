@@ -21,13 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 /* USB和蓝牙的显示参数 */
-#define VENDOR_ID 0x0606 /* USB VID */
-#define PRODUCT_ID 0x0101 /* USB PID */
-#define CONF_VENDOR_ID 0x0601 /* 配置项目内显示的VendorID */
-#define CONF_PRODUCT_ID 0x0106 /* 配置项目内显示的ProductID */
+#define VENDOR_ID 0xAF61 /* USB VID */
+#define PRODUCT_ID 0xAF01 /* USB PID */
+#define CONF_VENDOR_ID 0xAF61 /* 配置项目内显示的VendorID */
+#define CONF_PRODUCT_ID 0xAF01 /* 配置项目内显示的ProductID */
 #define DEVICE_VER 0x0001 /* 硬件版本 */
 #define MANUFACTURER "Lin" /* 硬件制造商，用于蓝牙显示 */
-#define PRODUCT "Lin Pad" /* 硬件名词，用于蓝牙显示 */
+#define PRODUCT "AMX60" /* 硬件名词，用于蓝牙显示 */
 // #define MACADDR_SEPRATOR ' ' /* 蓝牙名称后地址的分隔符。若不设置则不显示蓝牙名称后面的地址 */
 
 /* USB HID report parameter */
@@ -68,15 +68,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_MACRO
 //#define NO_ACTION_FUNCTION
 
-// LED 配置
-// #define LED_CAPS 4  //caps led ：5 ； led1、2、3、4：19、20、27、26
+
 
 // ws2812 RGB 配置
-#define RGB_DI_PIN 27
-#define RGBLED_NUM 17
+#define RGB_DI_PIN 14
+#define RGBLED_NUM 76
 #define DRIVER_LED_TOTAL RGBLED_NUM
 #define RGBLIGHT_ANIMATIONS
-#define RGB_PWR_PIN 18 // P-mos
+#define RGB_PWR_PIN 3 // P-mos
 // #define RGB_PWR_PIN_REVERSE 3 // P-mos
 //#define RGB_PWR_PIN_REVERSE 12 // N-mos
 
@@ -119,8 +118,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HAS_USB // 启用与CH554的通信支持
 // #define UART_RXD 7 // UART_RX口IO 17
 // #define UART_TXD 8 // UART_TX口IO 18
-#define UART_RXD 20 // UART_RX口IO 17
-#define UART_TXD 21 // UART_TX口IO 18
+#define UART_RXD 4 // UART_RX口IO 17
+#define UART_TXD 5 // UART_TX口IO 18
 //#define UART_DET 19 // UART 检测引脚，若此脚被拉低，则说明USB正在工作。若不配置则使用RX口作为检测引脚
 #define UART_BAUDRATE NRF_UART_BAUDRATE_115200 // 通信波特率，请不要修改
 
@@ -136,14 +135,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 按键阵列配置
 #define MATRIX_ROWS 5 /* 硬件阵列行数 */
-#define MATRIX_COLS 4/* 硬件阵列列数 */
+#define MATRIX_COLS 16/* 硬件阵列列数 */
 
 /* key combination for command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)))
 
-static const uint8_t row_pin_array[MATRIX_ROWS] = {22,13,15,25,23};
-static const uint8_t column_pin_array[MATRIX_COLS] = {6,9,10,26};
+static const uint8_t row_pin_array[MATRIX_ROWS] = {6,11,13,22,23};
+static const uint8_t column_pin_array[MATRIX_COLS] = {25,27,28,26,12,31,30,29,7,8,10,9,15,16,17,18};
 
 #define ROW_IN // 键盘阵列的二极管方向是从COL->ROW
 
