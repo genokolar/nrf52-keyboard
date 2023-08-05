@@ -1,22 +1,22 @@
-name: Build ALL 
+name: CI
 
 on:
-  workflow_dispatch:
   push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build:
-    name: Build all keyboard
+    name: CI
     runs-on: ubuntu-latest
 
     steps:
-    # 下载源码
-    - name: ⏬ Get source
+    - name: Get source
       uses: actions/checkout@v2
       with:
         submodules: recursive
-    # 下载安装相关工具
-    - name: ⚙️ Install Tools
+    - name: Install Tools
       run: |
         sudo apt-get update
         sudo apt-get -y install python3-pip python3-setuptools
@@ -25,53 +25,25 @@ jobs:
         wget https://sourceforge.net/projects/sdcc/files/sdcc-linux-amd64/4.0.0/sdcc-4.0.0-amd64-unknown-linux2.5.tar.bz2 -O /tmp/sdcc-4.0.0-amd64-unknown-linux2.5.tar.bz2
         tar xf /tmp/sdcc-4.0.0-amd64-unknown-linux2.5.tar.bz2 -C /tmp
         sudo cp -r /tmp/sdcc-4.0.0/* /usr/local
-        wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/9-2019q4/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -O /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2
-        tar xf /tmp/gcc-arm-none-eabi-9-2019-q4-major-x86_64-linux.tar.bz2 -C /tmp
-        wget https://github.com/genokolar/nrf52_tools/raw/main/mergehex -O /tmp/mergehex
-        sudo cp -r /tmp/mergehex /usr/local/bin/mergehex
-        sudo chmod 0755 /usr/local/bin/mergehex
-        echo GNU_INSTALL_ROOT := /tmp/gcc-arm-none-eabi-9-2019-q4-major/bin/>template/Makefile.posix
-        echo GNU_VERSION := 9.2.1>>template/Makefile.posix
-        echo GNU_PREFIX := arm-none-eabi>>template/Makefile.posix
-    # 编译固件
-    - name: ⚒️ Make Firmware
+        wget https://developer.arm.com/-/media/Files/downloads/gnu-rm/7-2018q2/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2 -O /tmp/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2
+        tar xf /tmp/gcc-arm-none-eabi-7-2018-q2-update-linux.tar.bz2 -C /tmp
+        wget http://developer.nordicsemi.com/nRF5_SDK/nRF5_SDK_v15.x.x/nRF5_SDK_15.3.0_59ac345.zip -O /tmp/nRF5_SDK_15.3.0_59ac345.zip
+        mkdir /tmp/sdk
+        unzip -q /tmp/nRF5_SDK_15.3.0_59ac345.zip -d /tmp/sdk
+        wget https://www.nordicsemi.com/-/media/Software-and-other-downloads/Desktop-software/nRF-command-line-tools/sw/Versions-10-x-x/10-12-1/nRFCommandLineTools10121Linuxamd64.tar.gz -O /tmp/nRF-command-line-tools.tar.gz
+        mkdir /tmp/tools
+        tar xf /tmp/nRF-command-line-tools.tar.gz -C /tmp/tools
+        tar xf /tmp/tools/nRF-Command-Line-Tools_10_12_1.tar -C /tmp/tools
+        sudo cp -r /tmp/tools/mergehex /opt
+        sudo ln -s /opt/mergehex/mergehex /usr/local/bin/mergehex
+        cp template/Makefile.posix.template template/Makefile.posix
+        sed -i "s/\/usr\/local/\/tmp/g" template/Makefile.posix
+        cp -r /tmp/sdk/nRF5_SDK_15.3.0_59ac345/* SDK/
+        rm -r tmk/tmk_core/protocol/usb_hid/USB_Host_Shield_2.0-tmk/
+        cd tmk/ && git reset --hard
+        cd ../
+    - name: Build
       run: |
         cd keyboard
-        make -j4
+        make -j
         cd ../
-    # 生成发布tag
-    - name: 🎉 Generate release tag
-      run: |
-        echo "VERSION=11`git log --abbrev-commit --pretty=oneline -1 | cut -c 1-6 || echo 'unknown'`" >> $GITHUB_ENV
-        echo "BUILDTIME=`date '+%Y%m%d'`" >> $GITHUB_ENV
-    # 上传编译生成的固件
-    - name: 📤 Upload Artifact Files
-      uses: actions/upload-artifact@v2
-      with:
-        name: LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}
-        path: |
-          ${{ github.workspace }}/keyboard/_build/*.zip
-          ${{ github.workspace }}/keyboard/_build/*.hex
-          ${{ github.workspace }}/keyboard/_build/*.bin
-    # 下载编译生成的固件      
-    - name: 📥 Download Artifact Files
-      uses: actions/download-artifact@v2
-      with:
-        name: LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}
-        path: ${{ github.workspace }}/keyboard/_build/Artifact
-    # 打包编译生成的固件
-    - name: 📦️ ZIP Artifact Files
-      run:  |
-        cd ${{ github.workspace }}/keyboard/_build/Artifact
-        zip -r ../LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}.zip *
-    # 通过FTP上传到个人HOST
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.1.0
-      with:
-        server: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        local-dir: ${{ github.workspace }}/keyboard/_build/
-        server-dir: /htdocs/down/sdk17/
-        state-name: ../.artifact-sync-state.json
-        exclude: "[*/**, *nrf52*.zip, *.hex, *.bin]"
