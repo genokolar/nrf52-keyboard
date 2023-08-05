@@ -1,4 +1,10 @@
 /*
+ * @Author: 林子 94795254@qq.com
+ * @Date: 2023-08-03 22:20:29
+ * @LastEditors: 林子 94795254@qq.com
+ * @LastEditTime: 2023-08-05 18:18:57
+ * @FilePath: \nrf52-keyboard\keyboard\sn80\actionmap_plain.c
+/*
  Copyright (C) 2021,2022 Geno <geno@live.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -19,8 +25,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "action_code.h"
 #include "actionmap_common.h"
 #include "keyboard_fn.h"
+#include "rgb_matrix.h"
+#include "rgb_matrix_types.h"
 #include "user_fn.h"
-// #include "rgblight.h"
+#include "host.h"
+
+
+extern uint8_t power_save_mode; //引入省电模式全局变量
 /* 
  * 定义需使用的FN按键
  */
@@ -69,4 +80,32 @@ const action_t actionmaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 };
 
+#define xx NO_LED
 
+#ifdef RGB_MATRIX_ENABLE
+
+led_config_t g_led_config = {
+    {
+        // Key Matrix to LED Index
+		{xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+		{xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+		{xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+		{xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+		{xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx},
+		{xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx,xx}
+    },
+    { // LED Index to Physical Position
+		{37,192},{38,195},{37,199},{37,203},{38,208},{37,211},{38,215},{38,218}
+	},
+    { // LED Index to Flag
+		4, 4, 4,  4, 4, 4,  4, 4}
+};
+
+void rgb_matrix_indicators_user(void){
+	// #ifdef RGB_MATRIX_INDICATORS_CAPS
+    if ((host_keyboard_leds() & (1 << 1)) && (power_save_mode != 2)) { //CAPS_LOCK
+        rgb_matrix_set_color_all(RGB_GREEN);
+    }
+}
+
+#endif

@@ -1,3 +1,7 @@
+/**
+
+*/
+
 /*
 Copyright 2012 Jun Wako <wakojun@gmail.com>
 Copyright 2019 Jim Jiang <jim@lotlab.org>
@@ -74,10 +78,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ws2812 RGB 配置
 #define RGB_DI_PIN 19
 #define RGBLED_NUM 8
+#define DRIVER_LED_TOTAL RGBLED_NUM
 #define RGBLIGHT_ANIMATIONS
 #define RGB_PWR_PIN 18 // P-mos
-// #define RGB_PWR_PIN_REVERSE 3 // P-mos
-//#define RGB_PWR_PIN_REVERSE 12 // N-mos
+
 
 // 3灯指示配置引脚
 // #define LED_STATUS_BLE 19
@@ -102,8 +106,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HAS_USB // 启用与CH554的通信支持
 // #define UART_RXD 7 // UART_RX口IO 17
 // #define UART_TXD 8 // UART_TX口IO 18
+
 #define UART_RXD 29 // UART_RX口IO 17
 #define UART_TXD 30 // UART_TX口IO 18
+
+
 //#define UART_DET 19 // UART 检测引脚，若此脚被拉低，则说明USB正在工作。若不配置则使用RX口作为检测引脚
 #define UART_BAUDRATE NRF_UART_BAUDRATE_115200 // 通信波特率，请不要修改
 
@@ -144,8 +151,3 @@ static const uint8_t column_pin_array[MATRIX_COLS] = {1,2,3,4,5,31,6,8,9,10,11,1
 //配置RTC预分频器.
 // <0> 32MHz <1> 16MHz <3> 8MHz <7> 4MHz <15> 2MHz <31> 1MHz 
 #define APP_TIMER_CONFIG_RTC_FREQUENCY 0
-
-
-// #define RGBLIGHT_LAYERS
-// #define RGBLIGHT_LAYERS_OVERRIDE_RGB_OFF
-// #define RGBLIGHT_LAYERS_RETAIN_VAL
