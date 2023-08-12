@@ -83,3 +83,4 @@ EventRecorderStub.scvd
 
 .DS_Store
 Thumbs.db
+SDK/external/micro-ecc/*

@@ -33,6 +33,12 @@ void rgb_matrix_indicators_advanced_kb(uint8_t led_min, uint8_t led_max)
 {
     if (rgb_matrix_is_indicator() && !rgb_matrix_is_enabled()) { //仅指示灯状态，先熄灭所有灯
         rgb_matrix_set_color_all(RGB_OFF);
+        // 关闭rgb后只显示指示灯
+        //lingyi
+        //默认关闭所有灯光
+        // #ifdef RGB_PWR_PIN
+        //    nrf_gpio_pin_write(RGB_PWR_PIN, 1);
+        // #endif
     }
 
     //键盘指示灯

@@ -21,14 +21,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdint.h>
 
 /* USB和蓝牙的显示参数 */
-#define VENDOR_ID 0x1209 /* USB VID */
-#define PRODUCT_ID 0x0514 /* USB PID */
-#define CONF_VENDOR_ID 0x4366 /* 配置项目内显示的VendorID */
-#define CONF_PRODUCT_ID 0x031A /* 配置项目内显示的ProductID */
-#define DEVICE_VER 0x0002 /* 硬件版本 */
+#define VENDOR_ID 0x0606 /* USB VID */
+#define PRODUCT_ID 0x0101 /* USB PID */
+#define CONF_VENDOR_ID 0x0601 /* 配置项目内显示的VendorID */
+#define CONF_PRODUCT_ID 0x0106 /* 配置项目内显示的ProductID */
+#define DEVICE_VER 0x0001 /* 硬件版本 */
 #define MANUFACTURER "Lin" /* 硬件制造商，用于蓝牙显示 */
-#define PRODUCT "PadC" /* 硬件名词，用于蓝牙显示 */
-#define MACADDR_SEPRATOR ' ' /* 蓝牙名称后地址的分隔符。若不设置则不显示蓝牙名称后面的地址 */
+#define PRODUCT "Lin Pad" /* 硬件名词，用于蓝牙显示 */
+// #define MACADDR_SEPRATOR ' ' /* 蓝牙名称后地址的分隔符。若不设置则不显示蓝牙名称后面的地址 */
 
 /* USB HID report parameter */
 #define KEYBOARD_EPSIZE 8 /* 键盘上传端点大小，请不要修改 */
@@ -40,12 +40,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 键盘省电参数
 #define SLEEP_SLOW_TIMEOUT 15 // 键盘闲置多久后转入慢速扫描模式 (s)
-#define SLEEP_OFF_TIMEOUT 1200 // 键盘闲置多久后转入自动关机 (s)
+#define SLEEP_OFF_TIMEOUT 600 // 键盘闲置多久后转入自动关机 (s)
 #define KEYBOARD_SCAN_INTERVAL 1 // 键盘最小时间单位TICK (ms)
 #define KEYBOARD_FAST_SCAN_INTERVAL 10 // 通常模式下，多久扫描一次键盘 (ms)
 #define KEYBOARD_SLOW_SCAN_INTERVAL 100 // 慢速模式下，多久扫描一次键盘 (ms)
 #define LED_AUTOOFF_TIME 5 /* LED自动熄灭时长(s)，设为0则不自动熄灭 */
-#define DCDC_ENABLED //启用DCDC电源模式
+// #define DCDC_ENABLED //启用DCDC电源模式
 
 // 键盘额外功能
 //#define DYNAMIC_TX_POWER /* 启用自动发射功率调整 */
@@ -72,11 +72,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define LED_CAPS 4  //caps led ：5 ； led1、2、3、4：19、20、27、26
 
 // ws2812 RGB 配置
-#define RGB_DI_PIN 1
-#define RGBLED_NUM 35
+#define RGB_DI_PIN 27
+#define RGBLED_NUM 17
 #define DRIVER_LED_TOTAL RGBLED_NUM
 #define RGBLIGHT_ANIMATIONS
-#define RGB_PWR_PIN 0 // P-mos
+#define RGB_PWR_PIN 18 // P-mos
+// #define RGB_PWR_PIN_REVERSE 3 // P-mos
 //#define RGB_PWR_PIN_REVERSE 12 // N-mos
 
 //RGB_MATRIX 配置
@@ -92,9 +93,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGB_MATRIX_STARTUP_HUE 0 // Sets the default hue value, if none has been set
 #define RGB_MATRIX_STARTUP_SAT 255 // Sets the default saturation value, if none has been set
 #define RGB_MATRIX_STARTUP_VAL RGB_MATRIX_MAXIMUM_BRIGHTNESS // Sets the default brightness value, if none has been set
-#define RGB_MATRIX_CENTER { 125, 125 }
-#define RGB_MATRIX_INDICATORS_NUM 0
-#define RGB_MATRIX_INDICATORS_HOST 1
+#define RGB_MATRIX_CENTER { 40,110 }
+// #define RGB_MATRIX_INDICATORS_HOST 1
 
 // 3灯指示配置引脚
 // #define LED_STATUS_BLE 19
@@ -113,24 +113,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define RGB_LIGHT_ANIMATIONS
 
 // 独立硬件按钮
-#define POWER_BUTTON 21
+// #define POWER_BUTTON 21
 
 // USB UART 传输配置
 #define HAS_USB // 启用与CH554的通信支持
-#define UART_RXD 9 // UART_RX口IO 17
-#define UART_TXD 10 // UART_TX口IO 18
+// #define UART_RXD 7 // UART_RX口IO 17
+// #define UART_TXD 8 // UART_TX口IO 18
+#define UART_RXD 20 // UART_RX口IO 17
+#define UART_TXD 21 // UART_TX口IO 18
 //#define UART_DET 19 // UART 检测引脚，若此脚被拉低，则说明USB正在工作。若不配置则使用RX口作为检测引脚
 #define UART_BAUDRATE NRF_UART_BAUDRATE_115200 // 通信波特率，请不要修改
 
 // 电量检测配置
-#define BATTERY_ADC_PIN NRF_SAADC_INPUT_AIN2 // 电量检测引脚 Pin 4
+#define BATTERY_ADC_PIN NRF_SAADC_INPUT_AIN0 
 
-// 充电检测配置
-//#define PIN_CHARGING !UCC1
-//#define PIN_STANDBY !UCC2
 
-// 多用途 Bootloader 按钮
-#define NRF_BL_DFU_MULTI_ROLE_BTN 21
+
 // Bootloader指示灯
 //#define LED_DFU_INIT 5
 //#define LED_DFU_START 4
@@ -138,37 +136,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // 按键阵列配置
 #define MATRIX_ROWS 5 /* 硬件阵列行数 */
-#define MATRIX_COLS 5 /* 硬件阵列列数 */
+#define MATRIX_COLS 4/* 硬件阵列列数 */
 
 /* key combination for command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)))
 
-static const uint8_t row_pin_array[MATRIX_ROWS] = {20, 18, 30, 25, 28};
-static const uint8_t column_pin_array[MATRIX_COLS] = {12, 14, 15, 16, 99};
+static const uint8_t row_pin_array[MATRIX_ROWS] = {22,13,15,25,23};
+static const uint8_t column_pin_array[MATRIX_COLS] = {6,9,10,26};
 
 #define ROW_IN // 键盘阵列的二极管方向是从COL->ROW
-
-// 旋钮配置
-#define ROTARY_ENCODER_A 6
-#define ROTARY_ENCODER_B 5
-// 旋钮正向按钮映射
-#define ROTARY_ENCODER_POS 4,1
-// 旋钮负向按钮映射
-#define ROTARY_ENCODER_NEG 4,3
-// 独立旋钮按键  用于关机后开机
-// #define ROTARY_BUTTON 10
-// SSD1306 LCD屏幕
-// #define SSD1306_SDA 25
-// #define SSD1306_SCL 27
-
-/* define if matrix has ghost */
-// #define MATRIX_HAS_GHOST /* 按键阵列是否出现Ghost Key，若没有加二极管则需要启用这个项目 */
 
 #define DEBOUNCE 5 /* 硬件消抖次数，设置为0则不消抖 */
 #define MATRIX_SCAN_DELAY_CYCLE 48 /* 按键扫描等待IO稳定的延时时长 */
 
-// 采用内部RC
+// // 采用内部RC
 #define NRFX_CLOCK_CONFIG_LF_SRC 0
 #define CLOCK_CONFIG_LF_SRC 0
 #define NRF_SDH_CLOCK_LF_SRC 0
