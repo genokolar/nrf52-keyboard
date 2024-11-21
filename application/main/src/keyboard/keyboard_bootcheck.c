@@ -26,6 +26,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "nrf_delay.h"
 #include "sleep_reason.h"
 #include "usb_comm.h"
+#include "nrf_gpio.h"
 
 #include "matrix.h"
 
@@ -70,7 +71,7 @@ static bool bootcheck_scan_key(uint16_t code)
 
 static bool keypress_check()
 {
-    uint8_t scan = 200;
+    uint8_t scan = 10;
     while (scan--) {
         matrix_scan();
         nrf_delay_ms(1);
@@ -122,8 +123,7 @@ __attribute__((weak)) void boot_check()
     // 自动休眠不需要检测，直接退出
     if (sleep_reason_get())
         return;
-#ifdef HAS_USB
-#endif
+    // 手动休眠，检测bootcheck功能是否启用，启用则检测开机按键
     if (bootcheck_flag_get()) {
         sleep_flag = true;
 #ifdef DEBUG_SKIP_PWRON_CHECK
@@ -134,9 +134,21 @@ __attribute__((weak)) void boot_check()
         if (sleep_flag) {
             sleep_flag = !keypress_check();
 #ifdef HAS_USB
-            // 若连接至主机则自动开机
-            if (usb_working())
-                sleep_flag &= false;
+            // 如果检测到UART信号则开机
+#ifdef UART_DET
+            if (!nrf_gpio_pin_read(UART_DET))
+#else
+            if (nrf_gpio_pin_read(UART_RXD))
+#endif
+            {
+                sleep_flag = false;
+            }
+#endif
+            // 如果检测到POWER BUTTON按下
+#ifdef POWER_BUTTON
+            if (!nrf_gpio_pin_read(POWER_BUTTON)) {
+                sleep_flag = false;
+            }
 #endif
         }
 

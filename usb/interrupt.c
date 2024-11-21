@@ -84,6 +84,7 @@ static void UsbTransfurEventHandler()
  */
 static void UsbBusResetEventHandler()
 {
+    // 总线复位
     UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
     UEP1_CTRL = bUEP_AUTO_TOG | UEP_R_RES_ACK | UEP_T_RES_NAK;
     UEP2_CTRL = bUEP_AUTO_TOG | UEP_R_RES_ACK | UEP_T_RES_NAK;
@@ -92,7 +93,7 @@ static void UsbBusResetEventHandler()
     USB_DEV_AD = 0x00;
     UIF_SUSPEND = 0;
     UIF_TRANSFER = 0;
-    UIF_BUS_RST = 0; //清中断标志
+    UIF_BUS_RST = 0; // 清中断标志
 
     // 重置状态
     usb_state.is_ready = false;

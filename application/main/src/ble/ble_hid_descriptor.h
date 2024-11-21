@@ -7,6 +7,7 @@ static uint8_t hid_descriptor[] = {
     0x09, 0x06, // Usage (Keyboard)
     0xA1, 0x01, // Collection (Application)
     0x85, 0x7f, // Report ID 0x7F
+    //8 bit修饰键
     0x05, 0x07, // Usage Page (Key Codes)
     0x19, 0xe0, // Usage Minimum (224)
     0x29, 0xe7, // Usage Maximum (231)
@@ -15,21 +16,22 @@ static uint8_t hid_descriptor[] = {
     0x75, 0x01, // Report Size (1)
     0x95, 0x08, // Report Count (8)
     0x81, 0x02, // Input (Data, Variable, Absolute)
-
+    //保留
     0x95, 0x01, // Report Count (1)
     0x75, 0x08, // Report Size (8)
     0x81, 0x01, // Input (Constant) reserved byte(1)
-
+    //LED 输出
     0x95, 0x05, // Report Count (5)
     0x75, 0x01, // Report Size (1)
     0x05, 0x08, // Usage Page (Page# for LEDs)
     0x19, 0x01, // Usage Minimum (1)
     0x29, 0x05, // Usage Maximum (5)
     0x91, 0x02, // Output (Data, Variable, Absolute), Led report
+    // LED填充
     0x95, 0x01, // Report Count (1)
     0x75, 0x03, // Report Size (3)
     0x91, 0x01, // Output (Data, Variable, Absolute), Led report padding
-
+    // 正常键位
     0x95, 0x06, // Report Count (6)
     0x75, 0x08, // Report Size (8)
     0x15, 0x00, // Logical Minimum (0)
@@ -40,13 +42,41 @@ static uint8_t hid_descriptor[] = {
     0x81, 0x00, // Input (Data, Array) Key array(6 bytes)
 
     0xC0, // End Collection (Application)
+#ifdef NKRO_ENABLE
+    /* nkro */
+    0x05, 0x01, // Usage Page (Generic Desktop),
+    0x09, 0x06, // Usage (Keyboard),
+    0xA1, 0x01, // Collection (Application),
+    0x85, 0x04, // Report ID (4)
 
+    // bitmap of modifiers
+    0x05, 0x07, // Usage Page (Key Codes),
+    0x75, 0x01, // Report Size (1),
+    0x95, 0x08, // Report Count (8),
+    0x15, 0x00, // Logical Minimum (0),
+    0x25, 0x01, // Logical Maximum (1),
+    0x19, 0xE0, // Usage Minimum (224),
+    0x29, 0xE7, // Usage Maximum (231),
+    0x81, 0x02, // Input (Data, Variable, Absolute), ;Modifier byte
+
+    // bitmap of keys
+    0x05, 0x07, // Usage Page (Key Codes),
+    0x95, 0xD8, // Report Count (216),
+    0x75, 0x01, // Report Size (1),
+    0x15, 0x00, // Logical Minimum (0),
+    0x25, 0x01, // Logical Maximum(1),
+    0x19, 0x00, // Usage Minimum (0),
+    0x29, 0XD8, // Usage Maximum (216),
+    0x81, 0x02, // Input (Data, Variable, Absolute),
+
+    0xc0, // End Collection
+#endif
 #ifdef MOUSEKEY_ENABLE
     /* mouse */
     0x05, 0x01, // USAGE_PAGE (Generic Desktop)
     0x09, 0x02, // USAGE (Mouse)
     0xa1, 0x01, // COLLECTION (Application)
-    0x85, REPORT_ID_MOUSE, //   REPORT_ID (1)
+    0x85, REPORT_ID_MOUSE, //   Report ID (1)
     0x09, 0x01, //   USAGE (Pointer)
     0xa1, 0x00, //   COLLECTION (Physical)
     // ----------------------------  Buttons
@@ -96,7 +126,7 @@ static uint8_t hid_descriptor[] = {
     0x05, 0x01, // USAGE_PAGE (Generic Desktop)
     0x09, 0x80, // USAGE (System Control)
     0xa1, 0x01, // COLLECTION (Application)
-    0x85, REPORT_ID_SYSTEM, //   REPORT_ID (2)
+    0x85, REPORT_ID_SYSTEM, //   Report ID (2)
     0x15, 0x01, //   LOGICAL_MINIMUM (0x1)
     0x26, 0xb7, 0x00, //   LOGICAL_MAXIMUM (0xb7)
     0x19, 0x01, //   USAGE_MINIMUM (0x1)
@@ -110,7 +140,7 @@ static uint8_t hid_descriptor[] = {
     0x05, 0x0c, // USAGE_PAGE (Consumer Devices)
     0x09, 0x01, // USAGE (Consumer Control)
     0xa1, 0x01, // COLLECTION (Application)
-    0x85, REPORT_ID_CONSUMER, //   REPORT_ID (3)
+    0x85, REPORT_ID_CONSUMER, //   Report ID (3)
     0x15, 0x01, //   LOGICAL_MINIMUM (0x1)
     0x26, 0x9c, 0x02, //   LOGICAL_MAXIMUM (0x29c)
     0x19, 0x01, //   USAGE_MINIMUM (0x1)
@@ -120,4 +150,23 @@ static uint8_t hid_descriptor[] = {
     0x81, 0x00, //   INPUT (Data,Array,Abs)
     0xc0, // END_COLLECTION
 #endif
+    // HID control
+    0x06, 0x00, 0xff, // Usage Page (Vendor Defined)
+    0x09, 0x01, // Usage Page (Vendor Defined)
+    0xa1, 0x01, // COLLECTION (Application)
+    0x85, 0x3f, // Report ID (63)
+    0x95, 0x3f, // Report Count 63
+    0x75, 0x08, // Report Size
+    0x25, 0x01, // Usage Maximum
+    0x15, 0x01, // Usage Minimum
+    0x09, 0x01, // Vendor Usage
+    0x81, 0x02, // Input (Data,Var,Abs)
+    0x85, 0x3f, // Report ID (63)
+    0x95, 0x3f, // Report Count 63
+    0x75, 0x08, // Report Size
+    0x25, 0x01, // Usage Maximum
+    0x15, 0x01, // Usage Minimum
+    0x09, 0x01, // Vendor Usage
+    0x91, 0x02, // Ouput (Data,Var,Abs)
+    0xc0 // end Application Collection
 };

@@ -17,6 +17,7 @@
  */
 
 #include "rgb_matrix.h"
+#include "rgblight_timer.h"
 #include "config.h"
 #include "data_storage.h"
 #include "keyboard_evt.h"
@@ -79,19 +80,19 @@ __attribute__((weak)) RGB rgb_matrix_hsv_to_rgb(HSV hsv)
 #endif
 
 #if !defined(RGB_MATRIX_HUE_STEP)
-#define RGB_MATRIX_HUE_STEP 8
+#define RGB_MATRIX_HUE_STEP 4
 #endif
 
 #if !defined(RGB_MATRIX_SAT_STEP)
-#define RGB_MATRIX_SAT_STEP 16
+#define RGB_MATRIX_SAT_STEP 8
 #endif
 
 #if !defined(RGB_MATRIX_VAL_STEP)
-#define RGB_MATRIX_VAL_STEP 16
+#define RGB_MATRIX_VAL_STEP 8
 #endif
 
 #if !defined(RGB_MATRIX_SPD_STEP)
-#define RGB_MATRIX_SPD_STEP 16
+#define RGB_MATRIX_SPD_STEP 8
 #endif
 
 #if !defined(RGB_MATRIX_STARTUP_MODE)
@@ -119,6 +120,10 @@ __attribute__((weak)) RGB rgb_matrix_hsv_to_rgb(HSV hsv)
 #define RGB_MATRIX_STARTUP_SPD UINT8_MAX / 2
 #endif
 
+#if !defined(RGB_MATRIX_POWERSAVE_VAL)
+#define RGB_MATRIX_POWERSAVE_VAL 64
+#endif
+
 // globals
 rgb_config_t rgb_matrix_config; // TODO: would like to prefix this with g_ for global consistancy, do this in another pr
 uint32_t g_rgb_timer;
@@ -133,6 +138,7 @@ last_hit_t g_last_hit_tracker;
 // internals
 static bool suspend_state = false;
 static bool rgb_last_enable;
+static bool rgb_powersave_mode = true;
 static uint8_t rgb_last_effect = UINT8_MAX;
 static effect_params_t rgb_effect_params = { 0, LED_FLAG_ALL, false };
 static rgb_task_states rgb_task_state = SYNCING;
@@ -166,7 +172,9 @@ void eeconfig_update_rgb_matrix(void) {
     rgb_matrix.data[0] = (rgb_matrix_config.raw % 0x100);
     rgb_matrix.data[1] = (rgb_matrix_config.raw >> 8);
     rgb_matrix.data[2] = (rgb_matrix_config.raw >> 16);
-    rgb_matrix.data[3] = (rgb_matrix_config.raw >> 24);
+    if (!rgb_powersave_mode) {
+        rgb_matrix.data[3] = (rgb_matrix_config.raw >> 24);
+    }
     rgb_matrix.data[4] = (rgb_matrix_config.raw >> 32);
     rgb_matrix.data[5] = (rgb_matrix_config.raw >> 40);
     storage_write((1 << STORAGE_CONFIG));
@@ -178,6 +186,7 @@ void eeconfig_update_rgb_matrix_default(void)
     rgb_matrix_config.indicators = 1;
     rgb_matrix_config.mode = RGB_MATRIX_STARTUP_MODE;
     rgb_matrix_config.hsv = (HSV) { RGB_MATRIX_STARTUP_HUE, RGB_MATRIX_STARTUP_SAT, RGB_MATRIX_STARTUP_VAL };
+    rgb_matrix.data[3] = (rgb_matrix_config.raw >> 24);  //补丁：解决首次启动由于默认为节能模式无法更新存储明度值的问题
     rgb_matrix_config.speed = RGB_MATRIX_STARTUP_SPD;
     rgb_matrix_config.flags = LED_FLAG_ALL;
     eeconfig_update_rgb_matrix();
@@ -542,13 +551,14 @@ void rgb_matrix_init(void)  //need mod
 //    eeconfig_debug_rgb_matrix(); // display current eeprom values
     ws2812_pwr_init();
     rgb_matrix_toggle_pwr();
+    rgb_timer_init();
 }
 
 //休眠关机时调用关闭RGB
 void rgb_matrix_sleep_prepare(void)  //need mod
 {
     // 禁用RGB MATRIX
-    rgb_matrix_disable_noeeprom();
+    ws2812_pwr_off();
     wait_ms(1);
     ws2812_pwr_deinit();
 }
@@ -667,7 +677,9 @@ void rgb_matrix_sethsv_eeprom_helper(uint16_t hue, uint8_t sat, uint8_t val, boo
     }
     rgb_matrix_config.hsv.h = hue;
     rgb_matrix_config.hsv.s = sat;
-    rgb_matrix_config.hsv.v = (val > RGB_MATRIX_MAXIMUM_BRIGHTNESS) ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : val;
+    if (!rgb_powersave_mode) {
+        rgb_matrix_config.hsv.v = (val > RGB_MATRIX_MAXIMUM_BRIGHTNESS) ? RGB_MATRIX_MAXIMUM_BRIGHTNESS : val;
+    }
     if (write_to_eeprom) {
         eeconfig_update_rgb_matrix();
     }
@@ -728,12 +740,28 @@ led_flags_t rgb_matrix_get_flags(void) { return rgb_matrix_config.flags; }
 
 void rgb_matrix_set_flags(led_flags_t flags) { rgb_matrix_config.flags = flags; }
 
+//设定未接入外接电源时的省电亮度
+static void rgb_matrix_set_power_save_mode()
+{
+    if (rgb_powersave_mode) {
+        if (rgb_matrix_get_val() > RGB_MATRIX_POWERSAVE_VAL) {
+            rgb_matrix_config.hsv.v = RGB_MATRIX_POWERSAVE_VAL;
+        }
+    } else {
+        rgb_matrix_config.hsv.v = rgb_matrix.data[3]; //读取存储的RGB VAL值
+    }
+}
+
 static void status_rgb_matrix_evt_handler(enum user_event event, void* arg) //need mod
 {
     uint8_t arg2 = (uint32_t)arg;
     switch (event) {
     case USER_EVT_STAGE:
         switch (arg2) {
+        case KBD_STATE_POST_INIT: // 开机初始化
+            rgb_matrix_init();
+            rgb_matrix_set_power_save_mode();
+            break;
         case KBD_STATE_SLEEP: // 准备休眠
             rgb_matrix_sleep_prepare();
             break;
@@ -745,6 +773,14 @@ static void status_rgb_matrix_evt_handler(enum user_event event, void* arg) //ne
         switch (arg2) {
         case PWR_SAVE_EXIT: // 重置省电模式
             power_save_reset();
+            break;
+        case PWR_SAVE_OFF: //禁用省电模式
+            rgb_powersave_mode = false;
+            rgb_matrix_set_power_save_mode();
+            break;
+        case PWR_SAVE_ON: //启用省电模式
+            rgb_powersave_mode = true;
+            rgb_matrix_set_power_save_mode();
             break;
         default:
             break;

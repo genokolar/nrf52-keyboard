@@ -1,27 +1,21 @@
 #include <stdint.h>
 #include <string.h>
 
+#include "main.h"
 #include "hid_configuration.h"
 #include "nordic_common.h"
 #include "usb_comm.h"
 #include "util.h"
 
 #include "action.h"
+#include "action_layer.h"
 #include "data_storage.h"
 #include "keymap.h"
+#include "keyboard_fn.h"
+#include "keyboard_battery.h"
+#include "ble_hid_service.h"
 
-#define HID_PROTOCOL 4
-#define MAX_HID_PACKET_SIZE 56
-
-#ifndef BUILD_TIME
-#define BUILD_TIME 0
-#endif
-
-#ifndef VERSION
-#define VERSION 00000000
-#endif
-
-#define APP_VERSION CONCAT_2(0x, VERSION)
+bool respond_flag; //用于判断发送的方向：false为USB，true为BLE
 
 const uint32_t keyboard_function_table =
 #ifdef BOOTMAGIC_ENABLE
@@ -90,7 +84,11 @@ void hid_response_success(uint8_t len, uint8_t* data)
     buff[0] = 0x00;
     buff[1] = len;
     memcpy(&buff[2], data, len);
-    uart_send_conf(len + 2, buff);
+    if (respond_flag) {
+        ble_send_conf(len + 2, buff);
+    } else {
+        uart_send_conf(len + 2, buff);
+    }
 }
 
 /**
@@ -100,7 +98,51 @@ void hid_response_success(uint8_t len, uint8_t* data)
  */
 void hid_response_generic(enum hid_response response)
 {
-    uart_send_conf(1, &response);
+    if (respond_flag) {
+        ble_send_conf(1, &response);
+    } else {
+        uart_send_conf(1, &response);
+    }
+}
+
+/**
+ * @brief 发送运行错误信息
+ *
+ * @param err_code 错误信息
+ */
+void hid_send_error(uint8_t id, uint32_t err_code)
+{
+    uint8_t data_buffer[6]; // 创建一个数组来存储err_code的字节
+    data_buffer[0] = 0xFE;  // 附加包头确认数据类型
+    data_buffer[1] = id;
+    // 将err_code的每个字节复制到data_buffer中
+    memcpy(data_buffer + 2, &err_code, sizeof(err_code));
+    if (respond_flag) {
+        ble_send_conf(4, data_buffer);
+    } else {
+        uart_send_conf(4, data_buffer);
+    }
+}
+
+/**
+ * @brief 发送运行记录日志
+ *
+ * @param flag 日志发送方向 1为USB，0为BLE
+ * @param id 日志ID 0~255
+ * @param data 日志数据
+ */
+void hid_send_log(bool flag, uint8_t id, uint8_t len, uint8_t* data)
+{
+    uint8_t data_buffer[61] = {0}; // 创建一个数组来存储log的字节
+    data_buffer[0] = 0xFE;  // 附加包头254【0xFE】确认数据类型为运行记录日志
+    data_buffer[1] = id;    // 附加ID，用于标示及确认日志来自于代码那个位置
+    //将data的每个字节复制到data_buffer中
+    memcpy(&data_buffer[2], data, len);
+    if (flag) {
+        uart_send_conf(len + 2, data_buffer);
+    } else {
+        ble_send_conf(len + 2, data_buffer);
+    }
 }
 
 /**
@@ -109,6 +151,8 @@ void hid_response_generic(enum hid_response response)
  */
 static void send_information()
 {
+    uint8_t default_layer = default_layer_state & 0XFF;
+    uint8_t layer = layer_state & 0XFF;
     const uint8_t info[] = {
         UINT16_SEQ(CONF_VENDOR_ID), // VENDOR
         UINT16_SEQ(CONF_PRODUCT_ID), // PRODUCT
@@ -117,6 +161,9 @@ static void send_information()
         UINT32_SEQ(APP_VERSION), // FIRMWARE_VER
         UINT32_SEQ(BUILD_TIME), // BUILD_DATE
         UINT32_SEQ(keyboard_function_table), // FUNCTION_TABLE
+        battery_info.percentage,
+        default_layer,
+        layer,
     };
     hid_response_success(sizeof(info), (uint8_t*)info);
 }
@@ -483,6 +530,12 @@ void hid_on_recv(uint8_t command, uint8_t len, uint8_t* data)
             hid_response_generic(HID_RESP_PARAMETER_ERROR);
         else
             reset_data(data[0]);
+        break;
+    case HID_CMD_CONTROL_KEYBOARD:
+        if (len != 2)
+            hid_response_generic(HID_RESP_PARAMETER_ERROR);
+        else
+            control_action(data[0],data[1]);
         break;
     default:
         hid_response_generic(HID_RESP_UNDEFINED);

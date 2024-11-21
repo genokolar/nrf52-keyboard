@@ -64,26 +64,19 @@ SRC_FILES += \
 	$(SDK_ROOT)/components/libraries/scheduler/app_scheduler.c \
 	$(SDK_ROOT)/components/libraries/timer/app_timer2.c \
 	$(SDK_ROOT)/components/libraries/util/app_util_platform.c \
-	$(SDK_ROOT)/components/libraries/crc16/crc16.c \
 	$(SDK_ROOT)/components/libraries/timer/drv_rtc.c \
 	$(SDK_ROOT)/components/libraries/fds/fds.c \
-	$(SDK_ROOT)/components/libraries/hardfault/hardfault_implementation.c \
 	$(SDK_ROOT)/components/libraries/util/nrf_assert.c \
 	$(SDK_ROOT)/components/libraries/atomic_fifo/nrf_atfifo.c \
 	$(SDK_ROOT)/components/libraries/atomic_flags/nrf_atflags.c \
 	$(SDK_ROOT)/components/libraries/atomic/nrf_atomic.c \
 	$(SDK_ROOT)/components/libraries/balloc/nrf_balloc.c \
-	$(SDK_ROOT)/external/fprintf/nrf_fprintf.c \
-	$(SDK_ROOT)/external/fprintf/nrf_fprintf_format.c \
 	$(SDK_ROOT)/components/libraries/fstorage/nrf_fstorage.c \
 	$(SDK_ROOT)/components/libraries/fstorage/nrf_fstorage_sd.c \
-	$(SDK_ROOT)/components/libraries/memobj/nrf_memobj.c \
 	$(SDK_ROOT)/components/libraries/pwr_mgmt/nrf_pwr_mgmt.c \
-	$(SDK_ROOT)/components/libraries/ringbuf/nrf_ringbuf.c \
 	$(SDK_ROOT)/components/libraries/experimental_section_vars/nrf_section_iter.c \
 	$(SDK_ROOT)/components/libraries/sortlist/nrf_sortlist.c \
 	$(SDK_ROOT)/components/libraries/strerror/nrf_strerror.c \
-	$(SDK_ROOT)/components/libraries/bootloader/dfu/nrf_dfu_svci.c \
 	$(SDK_ROOT)/components/libraries/low_power_pwm/low_power_pwm.c \
 	$(SDK_ROOT)/components/libraries/uart/app_uart_fifo.c \
 	$(SDK_ROOT)/components/libraries/fifo/app_fifo.c \
@@ -98,9 +91,6 @@ SRC_FILES += \
 	$(APP_SRC_DIR)/ble/ble_services.c \
 	$(APP_SRC_DIR)/ble/ble_hid_service.c \
 	$(APP_SRC_DIR)/ble/ble_bas_service.c \
-	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
-	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_Syscalls_GCC.c \
-	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
 	$(SDK_ROOT)/components/ble/peer_manager/auth_status_tracker.c \
 	$(SDK_ROOT)/components/ble/common/ble_advdata.c \
 	$(SDK_ROOT)/components/ble/ble_advertising/ble_advertising.c \
@@ -124,9 +114,6 @@ SRC_FILES += \
 	$(SDK_ROOT)/components/ble/ble_services/ble_bas/ble_bas.c \
 	$(SDK_ROOT)/components/ble/ble_services/ble_dis/ble_dis.c \
 	$(SDK_ROOT)/components/ble/ble_services/ble_hids/ble_hids.c \
-	$(SDK_ROOT)/components/ble/ble_services/ble_dfu/ble_dfu.c \
-	$(SDK_ROOT)/components/ble/ble_services/ble_dfu/ble_dfu_bonded.c \
-	$(SDK_ROOT)/components/ble/ble_services/ble_dfu/ble_dfu_unbonded.c \
 	$(SDK_ROOT)/components/softdevice/common/nrf_sdh.c \
 	$(SDK_ROOT)/components/softdevice/common/nrf_sdh_ble.c \
 	$(SDK_ROOT)/components/softdevice/common/nrf_sdh_soc.c \
@@ -139,7 +126,6 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/libraries/fstorage \
 	$(SDK_ROOT)/components/libraries/mutex \
 	$(SDK_ROOT)/components/libraries/gpiote \
-	$(SDK_ROOT)/components/libraries/bootloader/ble_dfu \
 	$(SDK_ROOT)/components/ble/ble_advertising \
 	$(SDK_ROOT)/components/ble/ble_services/ble_bas_c \
 	$(SDK_ROOT)/modules/nrfx/drivers/include \
@@ -156,8 +142,6 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/libraries/csense_drv \
 	$(SDK_ROOT)/components/libraries/memobj \
 	$(SDK_ROOT)/components/libraries/bootloader \
-	$(SDK_ROOT)/components/libraries/bootloader/dfu \
-	$(SDK_ROOT)/components/libraries/bootloader/ble_dfu \
 	$(SDK_ROOT)/components/libraries/low_power_pwm \
 	$(SDK_ROOT)/components/softdevice/common \
 	$(SDK_ROOT)/components/libraries/low_power_pwm \
@@ -168,14 +152,12 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components \
 	$(SDK_ROOT)/components/libraries/scheduler \
 	$(SDK_ROOT)/components/libraries/cli \
-	$(SDK_ROOT)/components/libraries/crc16 \
 	$(SDK_ROOT)/components/libraries/util \
 	$(APP_SRC_DIR)/config \
 	$(APP_SRC_DIR) \
 	$(SDK_ROOT)/components/libraries/csense \
 	$(SDK_ROOT)/components/libraries/balloc \
 	$(SDK_ROOT)/components/libraries/ecc \
-	$(SDK_ROOT)/components/libraries/hardfault \
 	$(SDK_ROOT)/components/libraries/hci \
 	$(SDK_ROOT)/components/libraries/timer \
 	$(SDK_ROOT)/components/libraries/uart \
@@ -183,7 +165,6 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/integration/nrfx \
 	$(SDK_ROOT)/components/libraries/sortlist \
 	$(SDK_ROOT)/components/libraries/spi_mngr \
-	$(SDK_ROOT)/components/libraries/led_softblink \
 	$(SDK_ROOT)/modules/nrfx/mdk \
 	$(SDK_ROOT)/components/ble/ble_link_ctx_manager \
 	$(SDK_ROOT)/components/ble/ble_services/ble_hids \
@@ -192,7 +173,6 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/ble/peer_manager \
 	$(SDK_ROOT)/components/libraries/mem_manager \
 	$(SDK_ROOT)/components/libraries/ringbuf \
-	$(SDK_ROOT)/components/ble/ble_services/ble_tps \
 	$(SDK_ROOT)/components/ble/ble_services/ble_dis \
 	$(SDK_ROOT)/components/ble/nrf_ble_gatt \
 	$(SDK_ROOT)/components/ble/nrf_ble_qwr \
@@ -201,7 +181,6 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/external/segger_rtt \
 	$(SDK_ROOT)/components/libraries/atomic_fifo \
 	$(SDK_ROOT)/components/libraries/crypto \
-	$(SDK_ROOT)/components/ble/ble_racp \
 	$(SDK_ROOT)/components/libraries/fds \
 	$(SDK_ROOT)/components/libraries/atomic_flags \
 	$(SDK_ROOT)/components/libraries/stack_guard \

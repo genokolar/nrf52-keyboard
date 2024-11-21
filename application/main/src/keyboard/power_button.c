@@ -72,7 +72,17 @@ static void button_handler(void)
 * @brief 初始化POWER_BUTTON按钮
  * 
  */
-void buttons_init(void)
+static void buttons_init(void)
+{
+    nrf_gpio_cfg_input(POWER_BUTTON,
+        NRF_GPIO_PIN_PULLUP);
+}
+
+/**
+ * @brief POWER_BUTTON按钮 准备睡眠
+ * 
+ */
+void buttons_sleep_prepare(void)
 {
     nrf_gpio_cfg_sense_input(POWER_BUTTON,
         NRF_GPIO_PIN_PULLUP,
@@ -85,7 +95,7 @@ static void power_button_evt_handler(enum user_event event, void* arg)
     switch (event) {
     case USER_EVT_STAGE:
         switch (arg2) {
-        case KBD_STATE_POST_INIT: // 初始化LED
+        case KBD_STATE_PRE_INIT:
             buttons_init();
             break;
         default:

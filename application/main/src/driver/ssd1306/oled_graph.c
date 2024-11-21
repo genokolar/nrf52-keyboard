@@ -157,7 +157,7 @@ void oled_draw_icon(uint8_t row, uint8_t col, const tImage* icon)
  * @param passkey 是否请求Passkey
  * @param led 键盘LED状态
  */
-void oled_draw_icons(uint8_t row, uint8_t batt, bool charging, enum connection_type conn, bool passkey, uint8_t led)
+void oled_draw_icons(uint8_t row, uint8_t batt, enum connection_type conn, bool passkey, uint8_t led)
 {
     oled_clear_row(row);
     oled_clear_row(row + 1);
@@ -175,12 +175,6 @@ void oled_draw_icons(uint8_t row, uint8_t batt, bool charging, enum connection_t
             ssd1306_display_buffer[row * SSD1306_COLS + i + index] = Icons[ICON_BATT_100]->data[i];
             ssd1306_display_buffer[(row + 1) * SSD1306_COLS + i + index] = Icons[ICON_BATT_100]->data[i + Icons[ICON_BATT_0]->width];
         }
-    }
-
-    // 充电图标
-    if (charging) {
-        index -= Icons[ICON_CHARGE]->width + ICON_SPACING;
-        oled_draw_icon(row, index, Icons[ICON_CHARGE]);
     }
 
     // 连接类型图标

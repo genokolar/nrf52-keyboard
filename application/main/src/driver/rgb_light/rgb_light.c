@@ -812,6 +812,7 @@ static void status_rgb_light_evt_handler(enum user_event event, void* arg)
     case USER_EVT_USB: // USB事件
         switch (arg2) {
         case USB_WORKING:
+        case USB_REMOTE_WAKE:
             usb_working = true;
             led_status_change();
             break;

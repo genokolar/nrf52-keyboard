@@ -11,7 +11,7 @@ jobs:
     steps:
     # 下载源码
     - name: ⏬ Get nRF52-Keyboard source
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive
     # 下载安装相关工具
@@ -45,27 +45,16 @@ jobs:
         echo "BUILDTIME=`date '+%Y%m%d'`" >> $GITHUB_ENV
     # 上传编译生成的固件
     - name: 📤 Upload Artifact Files
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}
         path: |
           ${{ github.workspace }}/keyboard/_build/*.zip
           ${{ github.workspace }}/keyboard/_build/*.hex
           ${{ github.workspace }}/keyboard/_build/*.bin
-    # 下载编译生成的固件      
-    - name: 📥 Download Artifact Files
-      uses: actions/download-artifact@v2
-      with:
-        name: LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}
-        path: ${{ github.workspace }}/keyboard/_build/Artifact
-    # 打包编译生成的固件
-    - name: 📦️ ZIP Artifact Files
-      run:  |
-        cd ${{ github.workspace }}/keyboard/_build/Artifact
-        zip -r ../LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}.zip *
     # 发布固件到genokolar/nrf52-keyboard库
     - name: 🎁 Release Firmware
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.BUILDTIME }}-${{ env.VERSION }}
         name: SDK17.1 ${{ env.BUILDTIME }}-${{ env.VERSION }}
@@ -76,62 +65,3 @@ jobs:
           ${{ github.workspace }}/keyboard/_build/*.hex
       env:
           GITHUB_TOKEN: ${{ secrets.KEYBOARD }}
-    # 通过FTP上传到个人HOST
-    - name: 📂 FTP upload firmware
-      uses: SamKirkland/FTP-Deploy-Action@4.1.0
-      with:
-        server: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        local-dir: ${{ github.workspace }}/keyboard/_build/
-        server-dir: /htdocs/down/Glab3.0/
-        state-name: ../.sdk17-glab3.0-firmware-sync-state.json
-        exclude: "[*/**, *-nrf52*_dfu-*.zip, *-nrf52*_kbd*.hex, *-ch554-*.bin]"
-    # 下载CMSIS-DAP Flasher源码
-    - name: ⏬ Get CMSIS-DAP Flasher source
-      uses: actions/checkout@v2
-      with:
-        repository: genokolar/cmsis-dap-flasher
-        path: cmsis-dap-flasher
-    # 为CMSIS-DAP Flasher生成hex目录存放固件
-    - name: 🗃 Generate Folder
-      run: |
-        cd ${{ github.workspace }}/cmsis-dap-flasher
-        mkdir hex
-        cd ${{ github.workspace }}
-    # 下载编译生成的固件      
-    - name: 📥 Download Artifact Files
-      uses: actions/download-artifact@v2
-      with:
-        name: LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}
-        path: ${{ github.workspace }}/cmsis-dap-flasher/hex/
-    # 更新CMSIS-DAP Flasher
-    - name: 📝 Update CMSIS-DAP Flasher Files
-      run: |
-        cd ${{ github.workspace }}/cmsis-dap-flasher
-        # 替换固件版本信息
-        sed -i 's/yyyymmdd-xxxxxxxx/${{ env.BUILDTIME }}-${{ env.VERSION }}/g' 开始烧录.bat
-        # 转换成Windows换行符
-        sed -i ':label;N;s/\n/*#/;b label' 开始烧录.bat
-        sed -i 's/*#/\r\n/g' 开始烧录.bat
-        # 删除HEX下多余文件
-        rm -rf ./hex/*.bin
-        rm -rf ./hex/*-nrf52*_dfu-*.zip
-        rm -rf ./hex/*-nrf52*_kbd*.hex
-        cd ${{ github.workspace }}
-    # 打包CMSIS-DAP Flasher
-    - name: 📦️ ZIP Artifact Files
-      run:  |
-        cd ${{ github.workspace }}/cmsis-dap-flasher
-        zip -r CMSIS-DAP线刷包${{ env.BUILDTIME }}-${{ env.VERSION }}-SDK17.1.zip *
-    # 通过FTP上传到个人HOST
-    - name: 📂 FTP upload CMSIS-DAP
-      uses: SamKirkland/FTP-Deploy-Action@4.1.0
-      with:
-        server: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        local-dir: ${{ github.workspace }}/cmsis-dap-flasher/
-        server-dir: /htdocs/down/Glab3.0/
-        state-name: ../.cmsis-dap-flasher-glab3.0-sync-state.json
-        exclude: "[*/**, *.bat, .gitignore]"

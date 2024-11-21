@@ -10,8 +10,10 @@ void hid_service_init(ble_srv_error_handler_t err_handler);
 void hid_event_handler(enum user_event evt, void* arg);
 void keys_send(uint8_t report_index, uint8_t key_pattern_len, uint8_t* p_key_pattern);
 bool hid_queue_empty(void);
+void ble_send_conf(uint8_t len, uint8_t* data);
 
 extern uint8_t keyboard_led_val_ble;
+extern bool m_ble_in_report_mode;
 
 /** Quick HID param setup macro
  * 

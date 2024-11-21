@@ -26,11 +26,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <string.h>
 
-#include "../ble/ble_hid_service.h"
 #include "../main.h"
 #include "app_timer.h"
 #include "hid_configuration.h"
 #include "host.h"
+#include "ble_hid_service.h"
 
 #include "keyboard_host_driver.h"
 #include "queue.h"
@@ -52,11 +52,11 @@ enum uart_usb_state {
 };
 
 struct usb_status {
-    bool charging_full; // 当前充电状态已满
     bool host_connected; // 当前已连接到主机
     bool usb_disable; // 临时禁用 USB 通信功能
     bool uart_checked; // UART 通信检测标志
     bool usb_protocol; // USB 报告类型
+    bool usb_remote_wake; //USB已连接并处于远程唤醒状态
     enum uart_usb_state state; // 当前 UART 所属状态
 };
 
@@ -90,8 +90,8 @@ static void send_event(enum user_event event, uint8_t arg)
 #ifdef NKRO_ENABLE
     switch (event) {
     case USER_EVT_USB:
-        if (arg != USB_WORKING)
-            trig_event_param(USER_EVT_PROTOCOL, HID_BOOT_PROTOCOL);
+        if (arg < USB_REMOTE_WAKE)
+            trig_event_param(USER_EVT_PROTOCOL, m_ble_in_report_mode); //USB 断开，切换到蓝牙HID 记录的协议模式 ? 需确认如果是返回2.4G模式是否会有影响
         else
             trig_event_param(USER_EVT_PROTOCOL, status.usb_protocol);
         break;
@@ -106,24 +106,22 @@ static void send_event(enum user_event event, uint8_t arg)
  * @brief 设置状态
  * 
  * @param host 是否连接到主机
- * @param charge_full 电量是否充满
+ * @param wakeup 主机是否处于睡眠模式
  * @param protocol USB 当前协议类型
  */
-static void set_state(bool host, bool charge_full, bool protocol)
+static void set_state(bool host, bool wakeup, bool protocol)
 {
     if ((status.state == UART_STATE_INITED) || host != status.host_connected) {
         status.host_connected = host;
         send_event(USER_EVT_USB, host ? (status.usb_disable ? USB_NOT_WORKING : USB_WORKING) : USB_NO_HOST);
     }
-#ifdef PIN_CHARGING
-    if ((status.state == UART_STATE_INITED) || charge_full != status.charging_full) {
-        status.charging_full = charge_full;
-        send_event(USER_EVT_CHARGE, status.charging_full ? BATT_CHARGED : BATT_CHARGING);
+    if ((status.state == UART_STATE_INITED) || wakeup != status.usb_remote_wake) {
+        status.usb_remote_wake = wakeup;
+        send_event(USER_EVT_USB, wakeup ? USB_REMOTE_WAKE : (host ? (status.usb_disable ? USB_NOT_WORKING : USB_WORKING) : USB_NO_HOST));
     }
-#endif
     if ((status.state == UART_STATE_INITED) || status.usb_protocol != protocol) {
         status.usb_protocol = protocol;
-        send_event(USER_EVT_PROTOCOL, protocol && usb_working() ? HID_REPORT_PROTOCOL : HID_BOOT_PROTOCOL);
+        send_event(USER_EVT_PROTOCOL, usb_working() ? protocol : m_ble_in_report_mode); //如USB工作，切换到改变的协议，如果USB 断开切换到蓝牙HID 记录的协议模式？2.4G 模式是否会有影响？
     }
     if (status.state == UART_STATE_INITED) {
         status.state = UART_STATE_WORKING;
@@ -165,12 +163,12 @@ static void uart_on_recv()
                 keyboard_led_val_usb = buff & 0x1F; // 5bit
             } else if (buff >= 0x10) { // status
                 bool success = buff & 0x01;
-                bool charging_status = buff & 0x02;
+                bool wakeup_status = buff & 0x02;
                 bool usb_status = buff & 0x04;
                 bool protocol = buff & 0x08;
 
                 // 设置当前状态
-                set_state(usb_status, charging_status, protocol);
+                set_state(usb_status, wakeup_status, protocol);
 
                 // 成功接收，出队。
                 if (success) {
@@ -184,15 +182,17 @@ static void uart_on_recv()
                 }
                 status.uart_checked = true;
             }
-        } else {
+        } else { //HID通讯命令
             recv_index++;
             if (recv_index >= recv_len) {
                 recv_index = 0;
                 uint8_t sum = checksum(recv_buf, recv_len - 1);
                 if (sum == recv_buf[recv_len - 1]) {
                     // U_CMD H_CMD H_LEN H_DAT... U_SUM
+                    respond_flag = false;
                     hid_on_recv(recv_buf[1], recv_len - 4, &recv_buf[3]);
                 } else {
+                    respond_flag = false;
                     hid_response_generic(HID_RESP_UART_CHECKSUM_ERROR);
                 }
                 recv_len = 0;
@@ -218,10 +218,7 @@ static void uart_to_idle()
     status.usb_disable = false;
     status.host_connected = false;
     send_event(USER_EVT_USB, USB_NOT_CONNECT);
-#ifdef PIN_CHARGING
-    send_event(USER_EVT_CHARGE, BATT_NOT_CHARGING);
-#endif
-    send_event(USER_EVT_PROTOCOL, HID_BOOT_PROTOCOL); // 蓝牙下默认使用BootProtocol（即不启用NKRO）
+    send_event(USER_EVT_PROTOCOL, m_ble_in_report_mode); // USB 断开，切换到蓝牙HID 记录的协议模式？ 2.4G 模式是否会有影响？
 }
 
 static void uart_init_hardware();
@@ -299,14 +296,14 @@ static void uart_task(void* context)
  */
 bool usb_working(void)
 {
-    return (status.state == UART_STATE_WORKING) && (status.host_connected) && !(status.usb_disable);
+    return (status.state == UART_STATE_WORKING) && (status.host_connected || status.usb_remote_wake) && !(status.usb_disable);
 }
 
 /**
  * @brief 通过USB发送按键数据包
  * 
  * @param index 数据包类型
- * @param len 长度
+ * @param len 长度             
  * @param pattern 
  */
 void usb_send(uint8_t index, uint8_t len, uint8_t* pattern)
@@ -333,9 +330,9 @@ void uart_send_conf(uint8_t len, uint8_t* data)
         return;
 
     uint8_t buff[64];
-    buff[0] = 0x80 + len;
+    buff[0] = 0x80 + len;  //添加UART通信头
     memcpy(&buff[1], data, len);
-    buff[len + 1] = checksum(buff, len + 1);
+    buff[len + 1] = checksum(buff, len + 1); //添加校验和
     uart_queue_enqueue(len + 2, buff);
 }
 

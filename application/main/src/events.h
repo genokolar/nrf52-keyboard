@@ -118,6 +118,7 @@ enum sleep_evt_type {
     SLEEP_EVT_MANUAL, // 手工休眠
     SLEEP_EVT_AUTO, // 自动睡眠
     SLEEP_EVT_MANUAL_NO_WAKEUP, // 手工休眠并禁用按键唤醒
+    SLEEP_EVT_RESET,  //重启键盘
 };
 
 /**
@@ -152,8 +153,9 @@ enum charging_state {
 enum usb_state {
     USB_NOT_CONNECT, // USB未连接
     USB_NO_HOST, // USB已连接但没有连接到主机
-    USB_WORKING, // USB当前正在工作
     USB_NOT_WORKING, // USB当前处于非活动状态（通过蓝牙等……）
+    USB_REMOTE_WAKE, // USB已连接但主机处于睡眠状态
+    USB_WORKING, // USB当前正在工作
 };
 
 /**
@@ -162,6 +164,7 @@ enum usb_state {
 enum hid_protocol_type {
     HID_BOOT_PROTOCOL, // bool protocol
     HID_REPORT_PROTOCOL, // report protocol
+    HID_UNKNOWN_PROTOCOL, // 协议未知，用于返回原协议
 };
 
 /**

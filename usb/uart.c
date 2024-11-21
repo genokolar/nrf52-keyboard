@@ -24,12 +24,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <stdbool.h>
 #include <string.h>
 
-#ifdef PIN_STANDBY
-#define IS_CHARGING (PIN_CHARGING && !PIN_STANDBY)
-#else
-#define IS_CHARGING (PIN_CHARGING)
-#endif
-
 uart_state uart_rx_state;
 static uint8_t recv_len, pos;
 static uint8_t __XDATA volatile recv_buff[64];
@@ -110,14 +104,28 @@ static void uart_data_parser(void)
     } else if (command >= 0x40) {
         uint8_t index = recv_buff[1];
         uint8_t kplen = (command & 0x3F);
-        if (index == 0) {
-            // 通常键盘数据包
-            KeyboardGenericUpload(&recv_buff[2], kplen);
+        if (index == 0) { // 类型Index。0: generic, 1: mouse, 2: system, 3: consumer, 0x80: nkro
+            // 连接中断，尝试唤醒
+            if (USB_MIS_ST & bUMS_SUSPEND) {
+                usb_state.is_busy = true;
+                CH554USBDevWakeup();
+                usb_state.is_busy = false;
+            } else if(usb_state.is_ready) {
+                // 通常键盘数据包
+                KeyboardGenericUpload(&recv_buff[2], kplen);
+            }
             last_success = true;
-        } else {
-            // 附加数据包
-            // 发过来的包的id和reportID一致，不用处理
-            KeyboardExtraUpload(&recv_buff[1], kplen + 1);
+        } else { // 附加数据包
+            // 类型Index。0: generic, 1: mouse, 2: system, 3: consumer, 0x80: nkro
+            // 连接中断，尝试唤醒
+            if (USB_MIS_ST & bUMS_SUSPEND) {
+                usb_state.is_busy = true;
+                CH554USBDevWakeup();
+                usb_state.is_busy = false;
+            } else if(usb_state.is_ready) {
+                // 附加数据包
+                KeyboardExtraUpload(&recv_buff[1], kplen + 1);
+            }
             last_success = true;
         }
     }
@@ -130,13 +138,11 @@ static void uart_data_parser(void)
 static void uart_send_status()
 {
     uint8_t data = 0x10;
-#ifdef PIN_CHARGING
-    if (!IS_CHARGING) // 是否充满
-        data |= 0x02;
-#endif
-    if (usb_state.is_ready && !usb_state.is_sleep) // 是否连接主机
+    if ((USB_MIS_ST & bUMS_SUSPEND) && RESET_KEEP) //曾经枚举成功，当前连接中断-->已连接但进入休眠
+        data |= 0x02; 
+    if (RESET_KEEP) // 是否连接主机
         data |= 0x04;
-    if (usb_state.protocol)
+    if (usb_state.protocol) //是否report protocol
         data |= 0x08;
     if (last_success) // 上次接收状态
         data |= 0x01;
@@ -181,7 +187,7 @@ void uart_check()
 }
 
 /**
- * @brief 接收数据
+ * @brief 接收到nRF52数据
  * 
  */
 void uart_recv(void)
@@ -215,7 +221,7 @@ void uart_recv(void)
 }
 
 /**
- * @brief 下发LED信号
+ * @brief 下发LED信号至nRF52
  * 
  * @param val 
  */
@@ -226,7 +232,7 @@ void uart_send_led(uint8_t val)
 }
 
 /**
- * @brief 下发keymap数据
+ * @brief 下发keymap数据至nRF52
  * 
  * @param data 
  * @param len 

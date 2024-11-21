@@ -3,6 +3,23 @@
 #include "nrf_section.h"
 #include <stdint.h>
 
+#define HID_PROTOCOL 4
+#define MAX_HID_PACKET_SIZE 56
+
+#ifndef BUILD_TIME
+#define BUILD_TIME 0
+#endif
+
+#ifndef VERSION
+#define VERSION 00000000
+#endif
+
+#define APP_VERSION CONCAT_2(0x, VERSION)
+
+extern const uint32_t keyboard_function_table;
+
+extern bool respond_flag;
+
 enum hid_command {
     // 获取键盘信息
     HID_CMD_GET_INFORMATION = 0x20,
@@ -42,6 +59,8 @@ enum hid_command {
     HID_CMD_WRITE_CONFIG = 0x3E,
     // 重置键盘
     HID_CMD_RESET_CONFIG = 0x3F,
+    // 控制键盘功能
+    HID_CMD_CONTROL_KEYBOARD=0X40,
 };
 
 enum hid_response {
@@ -62,6 +81,8 @@ enum hid_response {
 void hid_on_recv(uint8_t command, uint8_t len, uint8_t* data);
 void hid_response_success(uint8_t len, uint8_t* data);
 void hid_response_generic(enum hid_response response);
+void hid_send_error(uint8_t id, uint32_t err_code);
+void hid_send_log(bool flag, uint8_t id, uint8_t len, uint8_t* data);
 
 /**
  * @brief 配置记录区域

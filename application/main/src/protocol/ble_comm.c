@@ -33,12 +33,15 @@ static bool ble_host_working()
 static void ble_send_packet(enum packet_type type, uint8_t len, uint8_t* data)
 {
     // NKRO not support
-    if (type >= 0x80)
-        return;
+    //if (type >= 0x80)
+    //    return;
     // handle passkey input
     if (type == PACKET_KEYBOARD)
         passkey_input_handler(KEYBOARD_REPORT_SIZE - 2, &data[2]);
 
+    if (type == 0x80){ // 将包类型0x80转换成0x04
+        type = 0x04;
+    }
     keys_send(type, len, data);
 }
 

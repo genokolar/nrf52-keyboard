@@ -7,6 +7,9 @@
 #include <stdint.h>
 
 extern uint16_t m_conn_handle;
+#ifdef MULTI_DEVICE_SWITCH
+extern uint8_t ble_channel; /** 当前蓝牙设备通道 */
+#endif
 
 /**@brief Init basic ble services
  */
@@ -61,3 +64,5 @@ void ble_stack_stop(void);
 void ble_passkey_send(uint8_t const * p_key);
 
 void advertising_slow(void);
+
+void ble_disconnect();

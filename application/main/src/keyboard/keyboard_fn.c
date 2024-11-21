@@ -46,18 +46,15 @@ static void toggle_nkro()
 }
 #endif
 
-FN_HANDLER_DEF();
-
-__attribute__((weak)) void action_function(keyrecord_t* record, uint8_t id, uint8_t opt)
+static void share_action(uint8_t id, uint8_t opt)
 {
-    if (record->event.pressed) {
-        switch (id) {
-        case KEYBOARD_CONTROL:
-            switch (opt) {
-            case CONTROL_SLEEP: // 睡眠
-                sleep(SLEEP_MANUALLY);
-                break;
-            case CONTROL_NKRO: // 切换NKRO
+    switch (id) {
+    case KEYBOARD_CONTROL:
+        switch (opt) {
+        case CONTROL_SLEEP: // 睡眠
+            sleep(SLEEP_MANUALLY);
+            break;
+        case CONTROL_NKRO: // 切换NKRO
 #ifdef NKRO_ENABLE
                 toggle_nkro();
 #endif
@@ -111,9 +108,28 @@ __attribute__((weak)) void action_function(keyrecord_t* record, uint8_t id, uint
         }
     }
 
+FN_HANDLER_DEF();
+
+__attribute__((weak)) void action_function(keyrecord_t* record, uint8_t id, uint8_t opt)
+{
+    if (record->event.pressed) {
+        share_action(id, opt);
+    }
     // 交给其他Fn处理
     for (uint8_t i = 0; i < FN_HANDLER_COUNT; i++) {
         fn_handler* handler = (fn_handler*)FN_HANDLER_GET(i);
         (*handler)(record, id, opt);
+    }
+}
+
+CTRL_HANDLER_DEF();
+
+void control_action(uint8_t id, uint8_t opt)
+{
+    share_action(id, opt);
+    // 交给其他control处理
+    for (uint8_t i = 0; i < CTRL_HANDLER_COUNT; i++) {
+        control_handler* ctrl_handler = (control_handler*)CTRL_HANDLER_GET(i);
+        (*ctrl_handler)(id, opt);
     }
 }

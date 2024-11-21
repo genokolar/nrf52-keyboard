@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "../ble/ble_hid_service.h"
 #include "../ble/ble_services.h"
 #include "keyboard_services.h"
+#include "action_layer.h"
 #include "host.h"
 #include "passkey.h"
 #include "power_save.h"
@@ -110,13 +111,9 @@ static void internal_event_handler(enum user_event event, void* arg)
             sleep_reason_set(false);
         } // 开机会自动重设sleep reason，此次不用设定
         break;
-#ifdef PIN_CHARGING
-    case USER_EVT_CHARGE:
-#else
     case USER_EVT_USB:
-#endif
         // 接入和断开电源后，禁用和启用省电模式
-        power_attached = subEvent > 0;
+        power_attached = subEvent > USB_REMOTE_WAKE;
         power_save_set_mode(!power_attached);
         keyboard_powersave(!power_attached);
         break;
@@ -136,6 +133,8 @@ static void internal_event_handler(enum user_event event, void* arg)
         break;
     case USER_EVT_PROTOCOL:
         // 更改 hid 协议
+        if (subEvent == HID_UNKNOWN_PROTOCOL) // 未知协议，此处不做更改，应当由各自模块恢复原协议
+            break;
         keyboard_protocol = subEvent;
         break;
     default:

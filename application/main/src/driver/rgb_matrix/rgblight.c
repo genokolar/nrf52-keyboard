@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "app_timer.h"
+#include "rgblight_timer.h"
 #include "config.h"
 #include "data_storage.h"
 #include "keyboard_evt.h"
@@ -256,6 +257,7 @@ void rgblight_init(void)  //need mod
     } else {
         ws2812_pwr_off();
     }
+    rgb_timer_init();
     is_rgblight_initialized = true;
 }
 
@@ -1452,6 +1454,9 @@ static void status_rgblight_evt_handler(enum user_event event, void* arg) //need
     switch (event) {
     case USER_EVT_STAGE:
         switch (arg2) {
+        case KBD_STATE_POST_INIT: // 开机初始化
+            rgblight_init();
+            break;
         case KBD_STATE_SLEEP: // 准备休眠
             rgblight_sleep_prepare();
             break;

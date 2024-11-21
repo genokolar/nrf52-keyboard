@@ -22,5 +22,5 @@ enum connection_type {
 void oled_clear_row(uint8_t row);
 void oled_draw_text_5x8(uint8_t row, enum text_align align, uint8_t offset, const char* str);
 void oled_draw_text_16(uint8_t row, enum text_align align, uint8_t offset, const char* str);
-void oled_draw_icons(uint8_t row, uint8_t batt, bool charging, enum connection_type conn, bool passkey, uint8_t led);
+void oled_draw_icons(uint8_t row, uint8_t batt, enum connection_type conn, bool passkey, uint8_t led);
 

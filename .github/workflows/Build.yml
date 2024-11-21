@@ -12,7 +12,7 @@ jobs:
     steps:
     # 下载源码
     - name: ⏬ Get source
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         submodules: recursive
     # 下载安装相关工具
@@ -46,32 +46,10 @@ jobs:
         echo "BUILDTIME=`date '+%Y%m%d'`" >> $GITHUB_ENV
     # 上传编译生成的固件
     - name: 📤 Upload Artifact Files
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}
         path: |
           ${{ github.workspace }}/keyboard/_build/*.zip
           ${{ github.workspace }}/keyboard/_build/*.hex
           ${{ github.workspace }}/keyboard/_build/*.bin
-    # 下载编译生成的固件      
-    - name: 📥 Download Artifact Files
-      uses: actions/download-artifact@v2
-      with:
-        name: LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}
-        path: ${{ github.workspace }}/keyboard/_build/Artifact
-    # 打包编译生成的固件
-    - name: 📦️ ZIP Artifact Files
-      run:  |
-        cd ${{ github.workspace }}/keyboard/_build/Artifact
-        zip -r ../LotKB_Keyboard_Firmware_${{ env.BUILDTIME }}_${{ env.VERSION }}.zip *
-    # 通过FTP上传到个人HOST
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.1.0
-      with:
-        server: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        local-dir: ${{ github.workspace }}/keyboard/_build/
-        server-dir: /htdocs/down/sdk17/
-        state-name: ../.artifact-sync-state.json
-        exclude: "[*/**, *nrf52*.zip, *.hex, *.bin]"

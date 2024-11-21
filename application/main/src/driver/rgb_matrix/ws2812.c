@@ -172,9 +172,6 @@ void ws2812_pwr_deinit(void)
 //开启RGB电源
 void ws2812_pwr_on(void)
 {
-    if (powered) {//已经开启电源，直接返回
-        return;
-    }
 #ifdef RGB_PWR_PIN
     nrf_gpio_pin_write(RGB_PWR_PIN, 0);
 #endif
@@ -187,9 +184,6 @@ void ws2812_pwr_on(void)
 //关闭RGB电源
 void ws2812_pwr_off(void)
 {
-    if (!powered) { //已经关闭电源，直接返回
-        return;
-    }
 #ifdef RGB_PWR_PIN
     nrf_gpio_pin_write(RGB_PWR_PIN, 1);
 #endif

@@ -18,7 +18,9 @@ enum SLEEP_REASON {
     // 手动关机休眠，并禁用按键唤醒
     SLEEP_MANUALLY_NO_WAKEUP,
     // 非开机唤醒后休眠
-    SLEEP_NOT_PWRON
+    SLEEP_NOT_PWRON,
+    // 重启键盘
+    SLEEP_TO_RESET
 };
 /**
  * 触发一个事件
@@ -48,3 +50,5 @@ void sleep(enum SLEEP_REASON reason);
  */
 void notify_sleep(enum sleep_evt_type mode);
 extern bool erase_bonds;
+void service_error_handler(uint32_t nrf_error);
+extern bool ble_service_inited;

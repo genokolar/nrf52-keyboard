@@ -87,6 +87,8 @@
 #include "ble/ble_bas_service.h"
 #include "ble/ble_hid_service.h"
 #include "ble/ble_services.h"
+#include "nrf_sdh.h"
+#include "nrf_power.h"
 
 #include "main.h"
 
@@ -100,6 +102,8 @@
 #include "keyboard/keyboard_matrix.h"
 #include "protocol/usb_comm.h"
 #include "sleep_reason.h"
+#include "power_button.h"
+#include  "action.h"
 
 #define DEAD_BEEF 0xDEADBEEF /**< Value used as error code on stack dump, can be used to identify stack location on stack unwind. */
 #if APP_TIMER_CONFIG_USE_SCHEDULER == 1
@@ -112,6 +116,12 @@
 #endif
 APP_TIMER_DEF(sleep_delay_timer);
 static void sleep_delay_handler(void* p_context);
+
+
+void app_error_fault_handler(uint32_t id, uint32_t pc, uint32_t info)
+{
+    NVIC_SystemReset();
+}
 
 /**
  * @brief 初始化睡眠前延时计时器
@@ -232,8 +242,14 @@ static void timers_start(void)
 void notify_sleep(enum sleep_evt_type mode)
 {
     trig_event_param(USER_EVT_SLEEP, mode);
-    trig_event_param(USER_EVT_STAGE,KBD_STATE_SLEEP);
-    app_timer_start(sleep_delay_timer, APP_TIMER_TICKS(1000), (void*)(uint32_t)mode); //延迟1s进入睡眠
+    trig_event_param(USER_EVT_STAGE, KBD_STATE_SLEEP);
+    /**
+     * 延迟进入睡眠，由于按键进入睡眠时手指还按着按键，
+     * 如果延迟太短容易导致键盘直接重启，500ms~1000ms较为适宜
+     * 操作时要注意避免延迟期间继续按键，避免休眠成功又直接唤醒
+     * 同时要注意休眠延迟期间，如果有按键行为，键值将输出到连接设备
+     */ 
+    app_timer_start(sleep_delay_timer, APP_TIMER_TICKS(600), (void*)(uint32_t)mode); 
 }
 
 /**
@@ -252,12 +268,19 @@ static void sleep_mode_enter(bool keyboard_wakeup)
 #ifdef HAS_USB
         usb_comm_sleep_prepare();
 #endif
-
-    // Go to system-off mode (this function will not return; wakeup will cause a reset).
-    ret_code_t err_code = sd_power_system_off();
-    APP_ERROR_CHECK(err_code);
-    }
-
+#ifdef POWER_BUTTON
+        buttons_sleep_prepare();
+#endif
+#ifdef SOFTDEVICE_PRESENT
+        if (nrf_sdh_is_enabled()) {  //蓝牙模式下，调用sd_power_system_off进入system-off模式，避免无法正确休眠的问题
+            sd_power_system_off();
+        } else
+#endif // SOFTDEVICE_PRESENT
+        {
+            // ESB模式下，调用nrf_power_system_off进入system-off模式
+            nrf_power_system_off();
+        }
+}
 /**
  * @brief 延迟运行handler
  * 
@@ -269,10 +292,14 @@ static void sleep_delay_handler(void* p_context)
     switch (sleep_mode) {
     case SLEEP_EVT_AUTO:
     case SLEEP_EVT_MANUAL:
+    case SLEEP_NOT_PWRON:
         sleep_mode_enter(true);
         break;
     case SLEEP_EVT_MANUAL_NO_WAKEUP:
         sleep_mode_enter(false);
+        break;
+    case SLEEP_EVT_RESET:
+        NVIC_SystemReset();
         break;
     }
 }
@@ -295,9 +322,13 @@ void sleep(enum SLEEP_REASON reason)
     case SLEEP_MANUALLY_NO_WAKEUP:
         notify_sleep(SLEEP_EVT_MANUAL_NO_WAKEUP);
         break;
-    case SLEEP_NOT_PWRON:
-        matrix_deinit();
-        sleep_mode_enter(true);
+    case SLEEP_NOT_PWRON: // 键盘检测未符合开机条件，直接进入睡眠模式
+        matrix_deinit();  //此模式仅有部分初始化完成，故可以提前禁用matirx，避免按键输出
+        //sleep_mode_enter(true);   //不经过app_timer_start，直接进入睡眠模式 : bootcheck启用，手动休眠后，按下按键未唤醒会导致spcae+u无法唤醒
+        app_timer_start(sleep_delay_timer, APP_TIMER_TICKS(100), (void*)(uint32_t)SLEEP_NOT_PWRON);
+        break;
+    case SLEEP_TO_RESET:
+        app_timer_start(sleep_delay_timer, APP_TIMER_TICKS(100), (void*)(uint32_t)SLEEP_EVT_RESET); //重启不用考虑过多问题，可快速启动。当前实际未使用此模式，仅作为保留代码。
         break;
     default:
         break;
@@ -337,6 +368,7 @@ static void idle_state_handle(void)
 
 bool erase_bonds = false;
 
+bool ble_service_inited = false;  //判断蓝牙服务是否初始化，如未初始化，在ESB->BLE中将做初始化，否则就不需要再次初始化
 /**@brief Function for application main entry.
  */
 int main(void)
@@ -367,6 +399,7 @@ if (!sleep_flag)
     ble_services_init();
     battery_service_init();
     hid_service_init(service_error_handler);
+    ble_service_inited = true;
     adc_init();
     // call custom init function
     trig_event_param(USER_EVT_STAGE, KBD_STATE_POST_INIT);
@@ -385,6 +418,7 @@ if (!sleep_flag)
 #endif
     trig_event_param(USER_EVT_STAGE, KBD_STATE_INITED);
 }
+
     // Enter main loop.
     for (;;) {
         idle_state_handle();

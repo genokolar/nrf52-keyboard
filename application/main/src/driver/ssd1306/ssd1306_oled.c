@@ -208,7 +208,7 @@ static void ssd1306_wake()
 bool ssd1306_buff_dirty[SSD1306_ROWS];
 
 static enum connection_type conn_type = 0;
-static bool pwr_attach = false, usb_conn = false, ble_conn = false;
+static bool usb_conn = false, ble_conn = false;
 static bool passkey_req = false;
 static uint8_t keyboard_led = 0;
 static bool status_dirty = false;
@@ -242,7 +242,7 @@ static void update_status_bar()
     else
         conn_type = CONN_TYPE_NONE;
 
-    oled_draw_icons(0, battery_info.percentage, pwr_attach, conn_type, passkey_req, keyboard_led);
+    oled_draw_icons(0, battery_info.percentage, conn_type, passkey_req, keyboard_led);
     ssd1306_show_dirty_block();
 
     status_dirty = false;
@@ -306,10 +306,6 @@ static void ssd1306_event_handler(enum user_event event, void* arg)
         default:
             break;
         }
-        break;
-    case USER_EVT_CHARGE: // 充电状态
-        pwr_attach = (param != BATT_NOT_CHARGING);
-        status_mark_dirty();
         break;
     case USER_EVT_USB: // USB状态
         usb_conn = (param == USB_WORKING);

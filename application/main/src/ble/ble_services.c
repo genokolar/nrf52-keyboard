@@ -111,7 +111,7 @@ static void identities_set(pm_peer_id_list_skip_t skip)
     APP_ERROR_CHECK(err_code);
 }
 
-static void ble_disconnect()
+void ble_disconnect()
 {
     sd_ble_gap_adv_stop(m_advertising.adv_handle);
     if (m_conn_handle != BLE_CONN_HANDLE_INVALID) {
@@ -502,13 +502,14 @@ static void pm_evt_handler(pm_evt_t const* p_evt)
  */
 static void gap_params_init(void)
 {
-    ret_code_t err_code;
+    //ret_code_t err_code;
     ble_gap_conn_params_t gap_conn_params;
 
     set_device_name();
 
-    err_code = sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_HID);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    sd_ble_gap_appearance_set(BLE_APPEARANCE_GENERIC_HID);
+    //APP_ERROR_CHECK(err_code);
 
     memset(&gap_conn_params, 0, sizeof(gap_conn_params));
 
@@ -517,8 +518,9 @@ static void gap_params_init(void)
     gap_conn_params.slave_latency = SLAVE_LATENCY;
     gap_conn_params.conn_sup_timeout = CONN_SUP_TIMEOUT;
 
-    err_code = sd_ble_gap_ppcp_set(&gap_conn_params);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    sd_ble_gap_ppcp_set(&gap_conn_params);
+    //APP_ERROR_CHECK(err_code);
 }
 
 /**
@@ -526,8 +528,9 @@ static void gap_params_init(void)
  */
 static void gatt_init(void)
 {
-    ret_code_t err_code = nrf_ble_gatt_init(&m_gatt, NULL);
-    APP_ERROR_CHECK(err_code);
+    //ret_code_t err_code = 
+    nrf_ble_gatt_init(&m_gatt, NULL);
+    //APP_ERROR_CHECK(err_code);
 }
 
 /**
@@ -548,13 +551,14 @@ static void nrf_qwr_error_handler(uint32_t nrf_error)
  */
 static void qwr_init(void)
 {
-    ret_code_t err_code;
+    //ret_code_t err_code;
     nrf_ble_qwr_init_t qwr_init_obj = { 0 };
 
     qwr_init_obj.error_handler = nrf_qwr_error_handler;
 
-    err_code = nrf_ble_qwr_init(&m_qwr, &qwr_init_obj);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    nrf_ble_qwr_init(&m_qwr, &qwr_init_obj);
+    //APP_ERROR_CHECK(err_code);
 }
 
 /**
@@ -562,7 +566,7 @@ static void qwr_init(void)
  */
 static void dis_init(void)
 {
-    ret_code_t err_code;
+    //ret_code_t err_code;
     ble_dis_init_t dis_init_obj;
     ble_dis_pnp_id_t pnp_id;
 
@@ -578,8 +582,9 @@ static void dis_init(void)
 
     dis_init_obj.dis_char_rd_sec = SEC_JUST_WORKS;
 
-    err_code = ble_dis_init(&dis_init_obj);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    ble_dis_init(&dis_init_obj);
+    //APP_ERROR_CHECK(err_code);
 }
 
 #ifdef BUTTONLESS_DFU
@@ -616,7 +621,7 @@ static void conn_params_error_handler(uint32_t nrf_error)
  */
 static void conn_params_init(void)
 {
-    ret_code_t err_code;
+    //ret_code_t err_code;
     ble_conn_params_init_t cp_init;
 
     memset(&cp_init, 0, sizeof(cp_init));
@@ -630,8 +635,9 @@ static void conn_params_init(void)
     cp_init.evt_handler = NULL;
     cp_init.error_handler = conn_params_error_handler;
 
-    err_code = ble_conn_params_init(&cp_init);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    ble_conn_params_init(&cp_init);
+    //APP_ERROR_CHECK(err_code);
 }
 
 /**
@@ -836,6 +842,8 @@ void ble_stack_init(void)
     err_code = nrf_sdh_enable_request();
     APP_ERROR_CHECK(err_code);
 
+    ASSERT(nrf_sdh_is_enabled());
+
     // Configure the BLE stack using the default settings.
     // Fetch the start address of the application RAM.
     uint32_t ram_start = 0;
@@ -854,6 +862,8 @@ void ble_stack_init(void)
 void ble_stack_stop(void)
 {
     uint32_t err_code;
+    err_code = ble_conn_params_stop();
+    APP_ERROR_CHECK(err_code);
 
     err_code = nrf_sdh_disable_request();
     APP_ERROR_CHECK(err_code);
@@ -867,10 +877,11 @@ void ble_stack_stop(void)
 static void peer_manager_init(void)
 {
     ble_gap_sec_params_t sec_param;
-    ret_code_t err_code;
+    //ret_code_t err_code;
 
-    err_code = pm_init();
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    pm_init();
+    //APP_ERROR_CHECK(err_code);
 
     memset(&sec_param, 0, sizeof(ble_gap_sec_params_t));
 
@@ -888,11 +899,13 @@ static void peer_manager_init(void)
     sec_param.kdist_peer.enc = 1;
     sec_param.kdist_peer.id = 1;
 
-    err_code = pm_sec_params_set(&sec_param);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    pm_sec_params_set(&sec_param);
+    //APP_ERROR_CHECK(err_code);
 
-    err_code = pm_register(pm_evt_handler);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    pm_register(pm_evt_handler);
+    //APP_ERROR_CHECK(err_code);
 }
 
 /**
@@ -910,7 +923,7 @@ static void ble_advertising_error_handler(uint32_t nrf_error)
  */
 static void advertising_init(void)
 {
-    uint32_t err_code;
+    //uint32_t err_code;
     uint8_t adv_flags;
     ble_advertising_init_t init;
 
@@ -930,14 +943,16 @@ static void advertising_init(void)
     init.evt_handler = on_adv_evt;
     init.error_handler = ble_advertising_error_handler;
 
-    err_code = ble_advertising_init(&m_advertising, &init);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    ble_advertising_init(&m_advertising, &init);
+    //APP_ERROR_CHECK(err_code);
 
     ble_advertising_conn_cfg_tag_set(&m_advertising, APP_BLE_CONN_CFG_TAG);
 #ifdef HIGH_TX_POWER
     //更改发射功率到+4dBm
-    err_code = sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_advertising.adv_handle, 4);
-    APP_ERROR_CHECK(err_code);
+    //err_code = 
+    sd_ble_gap_tx_power_set(BLE_GAP_TX_POWER_ROLE_ADV, m_advertising.adv_handle, 4);
+    //APP_ERROR_CHECK(err_code);
 #endif
 }
 
@@ -957,11 +972,15 @@ void ble_services_init()
     gap_params_init();
     gatt_init();
     advertising_init();
-    // services
-    qwr_init();
+    // qwr初始化仅运行一次
+    if (!ble_service_inited) {
+        qwr_init();
+    }
     dis_init();
 #ifdef BUTTONLESS_DFU
+#ifdef NRF52832_XXAA
     dfu_init();
+#endif
 #endif
     conn_params_init();
 }
